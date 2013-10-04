@@ -8,7 +8,7 @@
 
 module.exports = {
     visit: visit
-}
+};
 
 /*
  * ast - AST object returned by esprima.parse
@@ -26,13 +26,13 @@ function visit(ast, visitors) {
     var evisit = function(n){return visit(n, visitors);};
 
     // apply each visitor to the current AST
-    ast = visitors.reduce(apply_visitor, ast)
+    ast = visitors.reduce(apply_visitor, ast);
 
     // figure out how to recurse
     switch (ast.type) {
     case "Program":
     case "BlockStatement":
-	ast.body = ast.body.map(evisit)
+	ast.body = ast.body.map(evisit);
 	break;
 
     case "WithStatement":
@@ -41,7 +41,7 @@ function visit(ast, visitors) {
 	break;
 
     case "SwitchStatement":
-	ast.cases = ast.cases.map(evisit)
+	ast.cases = ast.cases.map(evisit);
 	break;
 	
     case "TryStatement":
@@ -59,10 +59,20 @@ function visit(ast, visitors) {
     case "FunctionDeclaration":
     case "FunctionExpression":
 	ast.body = evisit(ast.body);
+	break;
+
+    case "ExpressionStatement":
+	ast.expression = evisit(ast.expression);
+	break;
+
+    case "IfStatement":
+	ast.test = evisit(ast.test);
+	ast.consequent = evisit(ast.consequent);
+	if (ast.alternate !== null)
+	    ast.alternate = evisit(ast.alternate);
+	break;
 
     case "LabeledStatement":
-    case "IfStatement":
-    case "ExpressionStatement":
     case "EmtpyStatement":
     case "BreakSTatement":
     case "ContinueStatement":

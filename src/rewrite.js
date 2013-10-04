@@ -18,8 +18,16 @@ function find_functions(node) {
     if (node.type == "FunctionDeclaration") {
 	console.log("got a function named " + node.id.name);
     }
-    return node
+    return node;
+}
+
+function find_calls(node) {
+    if (node.type != "CallExpression")
+	return node;
+
+    console.log("found function call to function " + node.callee.name);
+    return node;
 }
 
 visit.visit(parse_file(process.argv[2]), 
-	     [find_functions])
+	     [find_functions, find_calls])

@@ -1,7 +1,12 @@
 Megatron
 ========
 
-A  Javscript profiler for CMPSCI 630 . 
+A Javscript profiler for CMPSCI 630. 
+
+This project depends on the following libraries, all available through Node:
+
+* Esprima
+* escodegen
 
 Initial Design
 

@@ -28,24 +28,10 @@ function find_calls(node) {
     console.log("found function call to function " + node.callee.name);
     return node;
 }
-/* 
- * Given a function f, return an Esprima object corresponding to a
- * call to f with the given _args_ (an array of esprima objects).
- */ 
-function make_call(f, args) {
-    return {
-	type: "ExpressionStatement",
-	expression: {
-	    type: "CallExpression",
-	    callee: {
-		type: "Identifier",
-		name: f.name
-	    },
-	    arguments: args
-	}
-    };
-}
 
+/* 
+ * A visitor that adds entry and exit instrumentation to functions.
+ */ 
 function instrument_function(node) {
     if (node.type != "FunctionDeclaration")
 	return node;
@@ -56,11 +42,39 @@ function instrument_function(node) {
     function log_exit(func) {
     	console.log("exited function " + func.name);
     }
-
-    node.body.shift(make_call(log_entry, node.id));
-    node.body.push(make_call(log_exit, node.id));
+    
+    body.shift(visit.make_call(log_entry, node.id));
+    body.push(visit.make_call(log_exit, node.id));
+    node.body.body = body;
     return node;
 }
 
+function instrument_calls(node) {
+    if (node.type != "CallExpression")
+	return node;
+
+    function log_call(callee, thunk) {
+	// we need to get the caller somehow. We don't have access to
+	// that in the visitor pattern. I think we can do it via
+	// passing in an object that has information to the visitors,
+	// but that seems like a hack.
+	var caller = "magic";
+	console.log("call from " + caller + " to " + callee.name);
+	return thunk();
+    }
+    
+    var args = [node.callee,
+		visit.make_thunk(node)];
+    return visit.make_call(log_call, args);
+}
+
+
 visit.visit(parse_file(process.argv[2]), 
-	     [find_functions, find_calls])
+	    // since these go in-order, our call instrumentation has
+	    // to precede function instrumentation, so we don't
+	    // instrument our inserted calls. We could fix this by
+	    // folding them into one visitor, I think.
+	     [instrument_calls,
+	      instrument_function, 
+	      find_functions, 
+	      find_calls])

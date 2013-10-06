@@ -7,7 +7,10 @@
 
 
 module.exports = {
-    visit: visit
+    visit: visit,
+    make_thunk: make_thunk,
+    make_call: make_call,
+    make_id: make_id
 };
 
 /*
@@ -83,4 +86,58 @@ function visit(ast, visitors) {
     }
     return ast;
     
+}
+
+
+/* 
+ * Given an expression from Esprima, generate a thunk that yields the
+ * result of that expression.
+ */ 
+function make_thunk(expr) {
+    return {
+	type: "FunctionExpression",
+	id: null,
+	params: [],
+	defaults: [],
+	body: {
+	    type: "BlockStatement",
+	    body: [
+		{
+		    type: "ReturnStatement",
+		    argument: expr
+		}
+	    ]
+	},
+	rest: null,
+	generator: false,
+	expression: false
+    };
+}
+
+/* 
+ * Given a function f, return an Esprima object corresponding to a
+ * call to f with the given _args_ (an array of esprima objects).
+ */ 
+function make_call(f, args) {
+    return {
+	type: "ExpressionStatement",
+	expression: {
+	    type: "CallExpression",
+	    callee: {
+		type: "Identifier",
+		name: f.name
+	    },
+	    arguments: args
+	}
+    };
+}
+
+/*
+ * Return an esprima identifier for the argument.
+ */
+function make_id(x) {
+    return {
+	type: "Identifier",
+	name: x.name
+    };
 }

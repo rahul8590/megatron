@@ -28,6 +28,10 @@ function visit(ast, visitors) {
     }
     var evisit = function(n){return visit(n, visitors);};
 
+    // ignore nodes we've created
+    if (ast.__megatron_ignore)
+	return ast;
+    
     // apply each visitor to the current AST
     ast = visitors.reduce(apply_visitor, ast);
 
@@ -88,30 +92,37 @@ function visit(ast, visitors) {
     
 }
 
-
+/*
+ * Constructor for an AST node.
+ */ 
+function __construct_node() {
+    return {
+	__megatron_ignore: true
+    };
+}
 /* 
  * Given an expression from Esprima, generate a thunk that yields the
  * result of that expression.
  */ 
 function make_thunk(expr) {
-    return {
-	type: "FunctionExpression",
-	id: null,
-	params: [],
-	defaults: [],
-	body: {
-	    type: "BlockStatement",
-	    body: [
-		{
-		    type: "ReturnStatement",
-		    argument: expr
-		}
-	    ]
-	},
-	rest: null,
-	generator: false,
-	expression: false
+    var ret = __construct_node();
+    ret.type = "FunctionExpression";
+    ret.id = null;
+    ret.params = [];
+    ret.defaults = [];
+    ret.body = {
+	type: "BlockStatement",
+	body: [
+	    {
+		type: "ReturnStatement",
+		argument: expr
+	    }
+	]
     };
+    ret.rest = null;
+    ret.generator = false;
+    ret.expression = false;
+    return ret;
 }
 
 /* 
@@ -119,25 +130,25 @@ function make_thunk(expr) {
  * call to f with the given _args_ (an array of esprima objects).
  */ 
 function make_call(f, args) {
-    return {
-	type: "ExpressionStatement",
-	expression: {
-	    type: "CallExpression",
-	    callee: {
-		type: "Identifier",
-		name: f.name
-	    },
-	    arguments: args
-	}
+    var call = __construct_node();
+    call.type = "ExpressionStatement";
+    call.expression = {
+	type: "CallExpression",
+	callee: {
+	    type: "Identifier",
+	    name: f.name
+	},
+	arguments: args
     };
+    return call;
 }
 
 /*
  * Return an esprima identifier for the argument.
  */
 function make_id(x) {
-    return {
-	type: "Identifier",
-	name: x.name
-    };
+    var id = __construct_node();
+    id.type = "Identifier";
+    id.name = x.name;
+    return id;
 }

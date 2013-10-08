@@ -43,6 +43,7 @@ function instrument_function(node) {
     	console.log("exited function " + func.name);
     }
     
+    var body = node.body.body;
     body.shift(visit.make_call(log_entry, node.id));
     body.push(visit.make_call(log_exit, node.id));
     node.body.body = body;
@@ -68,13 +69,12 @@ function instrument_calls(node) {
     return visit.make_call(log_call, args);
 }
 
+// since these go in-order, our call instrumentation has to precede
+// function instrumentation, so we don't instrument our inserted
+// calls. We could fix this by folding them into one visitor, I think.
+var new_ast = visit.visit(parse_file(process.argv[2]), 
+	     [// instrument_calls,
+		 instrument_function, 
+		 find_functions, 
+		 find_calls]);
 
-visit.visit(parse_file(process.argv[2]), 
-	    // since these go in-order, our call instrumentation has
-	    // to precede function instrumentation, so we don't
-	    // instrument our inserted calls. We could fix this by
-	    // folding them into one visitor, I think.
-	     [instrument_calls,
-	      instrument_function, 
-	      find_functions, 
-	      find_calls])

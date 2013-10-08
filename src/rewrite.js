@@ -7,74 +7,65 @@
  */
  
 var esprima = require('esprima');
+var escodegen = require('escodegen');
 var fs = require('fs');
 var visit = require('./visit.js');
+var assert = require('assert');
+var util = require('util');
 
 function parse_file(filename) {
     return esprima.parse(fs.readFileSync(filename));
 }
 
-function find_functions(node) {
-    if (node.type == "FunctionDeclaration") {
-	console.log("got a function named " + node.id.name);
+function find_functions(node, ctx) {
+    if (node.type != "FunctionDeclaration") {
+	return node;
     }
+    console.log("got a function named " + node.id.name + 
+	       " inside function " + ctx.function);
     return node;
 }
 
-function find_calls(node) {
+function find_calls(node, ctx) {
     if (node.type != "CallExpression")
 	return node;
 
-    console.log("found function call to function " + node.callee.name);
+    console.log("found function call to function " + node.callee.name + 
+	       " in function " + ctx.function);
     return node;
 }
 
 /* 
  * A visitor that adds entry and exit instrumentation to functions.
  */ 
-function instrument_function(node) {
+function instrument_function(node, ctx) {
     if (node.type != "FunctionDeclaration")
 	return node;
 
-    function log_entry(func) {
-    	console.log("entered function " + func.name);
-    }
-    function log_exit(func) {
-    	console.log("exited function " + func.name);
-    }
-    
     var body = node.body.body;
-    body.shift(visit.make_call(log_entry, node.id));
-    body.push(visit.make_call(log_exit, node.id));
+    body.unshift(visit.make_expst(visit.make_call('log_entry', node.id)));
+    body.push(visit.make_expst(visit.make_call('log_exit', node.id)));
     node.body.body = body;
     return node;
 }
 
-function instrument_calls(node) {
+function instrument_calls(node, ctx) {
     if (node.type != "CallExpression")
 	return node;
 
-    function log_call(callee, thunk) {
-	// we need to get the caller somehow. We don't have access to
-	// that in the visitor pattern. I think we can do it via
-	// passing in an object that has information to the visitors,
-	// but that seems like a hack.
-	var caller = "magic";
-	console.log("call from " + caller + " to " + callee.name);
-	return thunk();
-    }
-    
-    var args = [node.callee,
+    var args = [visit.make_literal(ctx.function),
+		node.callee,
 		visit.make_thunk(node)];
-    return visit.make_call(log_call, args);
+    return visit.make_call('log_call', args);
 }
 
 // since these go in-order, our call instrumentation has to precede
 // function instrumentation, so we don't instrument our inserted
 // calls. We could fix this by folding them into one visitor, I think.
-var new_ast = visit.visit(parse_file(process.argv[2]), 
-	     [// instrument_calls,
-		 instrument_function, 
-		 find_functions, 
-		 find_calls]);
-
+var orig_ast = parse_file(process.argv[2]);
+var new_ast = visit.visit(orig_ast, 
+			  [instrument_calls,
+			   instrument_function
+			  ].reverse());
+// console.log(util.inspect(new_ast, {depth: null, showHidden: true}));
+console.log(escodegen.generate(new_ast));

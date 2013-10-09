@@ -7,6 +7,7 @@ This project depends on the following libraries, all available through Node:
 
 * Esprima
 * escodegen
+* HapiJs (Serverside JS Framework)
 
 Initial Design
 

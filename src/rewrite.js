@@ -64,7 +64,7 @@ function profile(program_string) {
 
     var ast = esprima.parse(program_string);
     var profiled_ast = visit.visit(ast, handlers);
-    return (fs.readFileSync('./rewrite.js') + 
+    return (fs.readFileSync('./runtime.js') + 
 	    "// instrumented code follows \n" + 
 	    escodegen.generate(profiled_ast));
 }

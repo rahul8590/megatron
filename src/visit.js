@@ -9,7 +9,7 @@ var assert = require('assert');
 
 module.exports = {
     visit: function(a, v) {return visit(a, v, 
-					{function: "top-level"})},
+					{function: "top-level"});},
     make_thunk: make_thunk,
     make_call: make_call,
     make_id: make_id,
@@ -27,6 +27,8 @@ module.exports = {
  * visitor.
  */
 function visit(ast, visitors, context) {
+    if (ast === null) 
+	return null;
     function apply_visitor(node, f) {
 	return f(node, context);
     }
@@ -36,7 +38,7 @@ function visit(ast, visitors, context) {
     }
 
     // ignore nodes we've created
-    if (ast.megatron_ignore == true) {
+    if (ast.megatron_ignore === true) {
 	return ast;
     }
     
@@ -59,21 +61,37 @@ function visit(ast, visitors, context) {
 	break;
 
     case "SwitchStatement":
+	ast.discriminant = evisit(ast.discriminant, context);
 	ast.cases = ast.cases.map(curry_evisit(context));
 	break;
 	
     case "TryStatement":
 	ast.block = evisit(ast.block, context);
-	if (ast.finalizer !== null)
-	    ast.finalizer = evisit(ast.finalizer);
+	ast.finalizer = evisit(ast.finalizer);
 	break;
 
     case "Function":
+    case "ForStatement":
+	ast.init = evisit(ast.init, context);
+	ast.update = evisit(ast.init, context);
+	// fall through
     case "WhileStatement":
     case "DoWhileStatement":
-    case "ForStatement":
+	ast.test = evisit(ast.test, context);
+	ast.body = evisit(ast.body, context);
+	break;
+
     case "ForOfStatement":
+    case "ForInStatement":
+	ast.left = evisit(ast.left, context);
+	ast.right = evisit(ast.right, context);
+	ast.body = evisit(ast.body, context);
+	break;
+
     case "LetStatement":
+	ast.head.init = evisit(ast.head.init, context);
+
+
     case "FunctionExpression":
 	// console.log("recursing into function expression");
 	ast.body = evisit(ast.body, context);
@@ -94,16 +112,26 @@ function visit(ast, visitors, context) {
 	// console.log("Recursing into if statement");
 	ast.test = evisit(ast.test, context);
 	ast.consequent = evisit(ast.consequent, context);
-	if (ast.alternate !== null)
-	    ast.alternate = evisit(ast.alternate, context);
+	ast.alternate = evisit(ast.alternate, context);
 	break;
 
     case "LabeledStatement":
+	ast.body = evisit(ast.body, context);
+	break;
+
+    case "ThrowStatement": // argument will never be null for a throw,
+			   // but it doesn't really matter
+    case "ReturnStatement":
+	ast.argument = evisit(ast.argument, context);
+	break;
+
+    case "TryStatement":
+	ast.block = evisit(ast.block, context);
+	ast.finalizer = evisit(ast.finalizer, context);
+
     case "EmtpyStatement":
     case "BreakSTatement":
     case "ContinueStatement":
-    case "ReturnStatement":
-    case "ThrowStatement":
     case "DebuggerStatement":
     default: 
 	// console.log("Hit default");
@@ -156,7 +184,7 @@ function make_call(fname, args) {
 	type: "Identifier",
 	name: fname
     };
-    call.arguments = args
+    call.arguments = args;
     return call;
 }
 

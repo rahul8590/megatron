@@ -14,7 +14,7 @@ var assert = require('assert');
 var util = require('util');
 
 function parse_file(filename) {
-    return esprima.parse(fs.readFileSync(filename));
+    return esprima.parse();
 }
 
 function find_functions(node, ctx) {
@@ -59,13 +59,12 @@ function instrument_calls(node, ctx) {
     return visit.make_call('log_call', args);
 }
 
-// since these go in-order, our call instrumentation has to precede
-// function instrumentation, so we don't instrument our inserted
-// calls. We could fix this by folding them into one visitor, I think.
-var orig_ast = parse_file(process.argv[2]);
-var new_ast = visit.visit(orig_ast, 
-			  [instrument_calls,
-			   instrument_function
-			  ].reverse());
-// console.log(util.inspect(new_ast, {depth: null, showHidden: true}));
-console.log(escodegen.generate(new_ast));
+function profile(program_string) {
+    var handlers = [instrument_calls, instrument_function];
+
+    var ast = esprima.parse(program_string);
+    var profiled_ast = visit.visit(ast, handlers);
+    return escodegen.generate(profiled_ast);
+}
+
+console.log(profile(fs.readFileSync(process.argv[2])))

@@ -1,8 +1,12 @@
 var Hapi = require('hapi');
+var profile = require('./src/rewrite.js');
+
 // Create a server with a host and port
 var server = Hapi.createServer('localhost', 8000);
-function profile (request) {
-				request.reply(request.payload.code );	
+function code_post (request) {
+				request.reply(request.payload.code );
+				var code_profile = profile.profile(request.payload.code);
+				console.log(code_profile);
 }
 server.route([
     {
@@ -16,7 +20,7 @@ server.route([
 	method: 'POST',
 	path: '/profile',
 	//handler: { file: './public/about.html' }
-	config: { handler: profile }
+	config: { handler: code_post }
 	}
 
 ]);

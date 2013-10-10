@@ -64,9 +64,17 @@ function profile(program_string) {
 
     var ast = esprima.parse(program_string);
     var profiled_ast = visit.visit(ast, handlers);
-    return (fs.readFileSync('./runtime.js') + 
+    return (fs.readFileSync('./src/runtime.js') + 
 	    "// instrumented code follows \n" + 
 	    escodegen.generate(profiled_ast));
 }
 
-console.log(profile(fs.readFileSync(process.argv[2])))
+//console.log(profile(fs.readFileSync(process.argv[2])))
+
+module.exports = {
+    profile: profile,
+    instrument_calls: instrument_calls,
+    instrument_function: instrument_function, 
+    find_calls: find_calls,
+    find_functions: find_functions
+};

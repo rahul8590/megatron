@@ -1,6 +1,9 @@
 var Hapi = require('hapi');
 // Create a server with a host and port
 var server = Hapi.createServer('localhost', 8000);
+function profile (request) {
+				request.reply(request.payload.code );	
+}
 server.route([
     {
 	method: 'GET',
@@ -10,9 +13,10 @@ server.route([
     	}
     },
 	{
-	method: 'GET',
-	path: '/about',
-	handler: { file: './public/about.html' }
+	method: 'POST',
+	path: '/profile',
+	//handler: { file: './public/about.html' }
+	config: { handler: profile }
 	}
 
 ]);

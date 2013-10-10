@@ -24,6 +24,12 @@
   </head>
 
   <body>
+    <script>
+    function formsubmit() {
+      document.getElementById('icode').submit();
+
+    }
+    </script>
 
     <div class="container">
       <div class="header">
@@ -37,43 +43,23 @@
 
       <div class="jumbotron">
         <h3 class="text-muted">Enter the Code in here</h3>
-        <div class = "span6">
-          <textarea class="field span12" id="textarea" rows="6" cols="60"></textarea>
-        </div>
-      </br>
-        <p><a class="btn btn-lg btn-success" href="#">Profile Me</a></p>
+        
+        <form id="icode" name="input" action="/profile" method="post">
+          <div class = "span6">
+            <textarea class="field span12" name = "code" id="code" rows="6" cols="60">
+            </textarea>
+          </div>
+          </br>
+          <p><input type="button" class="btn btn-lg btn-success" onclick="formsubmit()"value="profile me"></p>
+          </form>
       </div>
 
       <div class="row marketing">
-      <!--
-        <div class="col-lg-6">
-          <h4>Subheading</h4>
-          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-          <h4>Subheading</h4>
-          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-          <h4>Subheading</h4>
-          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+        <div class="footer">
+          <p>&copy; UMass Amherst</p>
         </div>
 
-        <div class="col-lg-6">
-          <h4>Subheading</h4>
-          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-          <h4>Subheading</h4>
-          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-          <h4>Subheading</h4>
-          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-        </div>
-      </div>
-      -->
-      <div class="footer">
-        <p>&copy; UMass Amherst</p>
-      </div>
-
-    </div> <!-- /container -->
+      </div> <!-- /container -->
 
 
     <!-- Bootstrap core JavaScript

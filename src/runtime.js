@@ -1,6 +1,21 @@
 function get_really_high_res_time() {
     // browser-compatible
-    return 0;
+    var t0,t1,delta;
+    if (detect_browser != 'Safari') {
+        t0 = window.performance.now();
+        // function to be called in this 
+        t1 = window.performance.now();
+        delta = t1 - t0;
+        
+    }
+    else {
+        t0 = Date.now();
+        //function calls which are to be executed 
+        t1 = Date.now();
+        delta = t1 - t0;
+    }
+    console.log("time taken to execute is:"+delta);
+    return delta;
 }
 
 function log_call(caller, callee, thunk) {

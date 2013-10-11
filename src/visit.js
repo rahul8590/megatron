@@ -26,9 +26,17 @@ module.exports = {
  * visitor. Replace the node in the AST with the output of the final
  * visitor.
  */
-function visit(ast, visitors, context) {
+function visit(ast, visitors, context, debug) {
+    if (debug === undefined)
+	debug = false;
     if (ast === null) 
 	return null;
+    
+    function debug(s) {
+	if (debug)
+	    console.log('//' + s);
+    }
+    
     function apply_visitor(node, f) {
 	return f(node, context);
     }
@@ -42,6 +50,8 @@ function visit(ast, visitors, context) {
 	return ast;
     }
     
+    debug("Visiting a statement of type " + ast.type);
+
     // apply each visitor to the current AST
     ast = visitors.reduce(apply_visitor, ast);
 
@@ -64,10 +74,24 @@ function visit(ast, visitors, context) {
 	ast.discriminant = evisit(ast.discriminant, context);
 	ast.cases = ast.cases.map(curry_evisit(context));
 	break;
-	
+
+    case "SwitchCase":
+	ast.test = evisit(ast.test, context);
+	ast.consequent = ast.consequent.map(curry_evisit(context));
+	break;
+
     case "TryStatement":
 	ast.block = evisit(ast.block, context);
 	ast.finalizer = evisit(ast.finalizer);
+	break;
+
+    case "CatchClause":
+	ast.guard = evisit(ast.guard, context);
+	ast.body = evisit(ast.body, context);
+	break;
+
+    case "ComprehensionBlock":
+	ast.right = evisit(ast.right, context);
 	break;
 
     case "Function":
@@ -89,32 +113,91 @@ function visit(ast, visitors, context) {
 	break;
 
     case "LetStatement":
+    case "LetExpression":
 	ast.head.init = evisit(ast.head.init, context);
-
-
-    case "FunctionExpression":
-	// console.log("recursing into function expression");
-	ast.body = evisit(ast.body, context);
 	break;
 
     case "FunctionDeclaration":
-	// console.log("recursing into function decl");
-	ast.body = evisit(ast.body, {function: ast.id.name});
+	var new_context = {function: ast.id.name};
+	ast.body = evisit(ast.body, new_context);
+	ast.defaults = ast.defaults.map(curry_evisit(new_context));
 	break;
 
+    case "VariableDeclaration":
+	ast.declarations = ast.declarations.map(curry_evisit(context));
+	break;
+
+    case "VariableDeclarator":
+	ast.init = evisit(ast.init, context);
+	break;
 	
     case "ExpressionStatement":
-	// console.log("recursing into expression statement");
 	ast.expression = evisit(ast.expression, context);
 	break;
 
+    case "FunctionExpression":
+	var new_context = {function: "anonymous function in " + context.function};
+	ast.body = evisit(ast.body, new_context);
+	ast.defaults = ast.defaults.map(curry_evisit(new_context));
+	break;
+
+    case "ArrayExpression":
+	ast.elements = ast.elements.map(curry_evisit(context));
+	break;
+
+    case "ObjectExpression":
+	ast.properties = ast.properties.map(function (p) {
+	    p.value = evisit(p.value, context);
+	    return p;
+	});
+	break;
+
+    case "ArrowExpression":
+	ast.defaults = ast.defaults.map(curry_evisit(context));
+	ast.body = evisit(ast.body, context);
+	break;
+
+    case "SequenceExpression":
+	ast.expressions = ast.expressions.map(curry_evisit(context));
+	break;
+
+    case "UnaryExpression":
+    case "UpdateExpression":
+	ast.argument = evisit(ast.argument, context);
+	break;
+	
+    case "BinaryExpression":
+    case "AssignmentExpression":
+    case "LogicalExpression":
+	ast.left = evisit(ast.left, context);
+	ast.right = evisit(ast.right, context);
+	break;
+
+    case "ConditionalExpression":
     case "IfStatement":
-	// console.log("Recursing into if statement");
 	ast.test = evisit(ast.test, context);
 	ast.consequent = evisit(ast.consequent, context);
 	ast.alternate = evisit(ast.alternate, context);
 	break;
 
+    case "CallExpression":
+	ast.arguments = ast.arguments.map(curry_evisit(context));
+	ast.callee = evisit(ast.callee, context);
+	break;
+
+    case "MemberExpression":
+	ast.object = evisit(ast.object, context);
+	if (ast.computed)
+	    ast.property = evisit(ast.property, context);
+	break;
+
+    case "ComprehensionExpression":
+    case "GeneratorExpression":
+	ast.body = evisit(ast.body, context);
+	ast.blocks = ast.blocks.map(curry_evisit(context));
+	ast.filter = evisit(ast.filter, context);
+	break;
+	
     case "LabeledStatement":
 	ast.body = evisit(ast.body, context);
 	break;
@@ -128,13 +211,17 @@ function visit(ast, visitors, context) {
     case "TryStatement":
 	ast.block = evisit(ast.block, context);
 	ast.finalizer = evisit(ast.finalizer, context);
+	break;
 
     case "EmtpyStatement":
     case "BreakSTatement":
     case "ContinueStatement":
     case "DebuggerStatement":
+    case "ThisExpression":
+    case "Identifier":
+    case "GraphExpression":
     default: 
-	// console.log("Hit default");
+	break;
     }
     return ast;
 }

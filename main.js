@@ -4,9 +4,9 @@ var profile = require('./src/rewrite.js');
 // Create a server with a host and port
 var server = Hapi.createServer('localhost', 8000);
 function code_post (request) {
-				request.reply(request.payload.code );
-				var code_profile = profile.profile(request.payload.code);
-				console.log(code_profile);
+    var code_profile = profile.profile(request.payload.code);
+    console.log(code_profile);
+    request.reply(code_profile);
 }
 server.route([
     {

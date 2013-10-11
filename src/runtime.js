@@ -1,9 +1,9 @@
 function log_entry(func) {
-    console.log(">>>entered function " + func.name);
+    console.log(">>>entered function " + func);
 }
 
 function log_exit(func) {
-    console.log(">>>exited function " + func.name);
+    console.log(">>>exited function " + func);
 }
 
 function log_call(caller, callee, thunk) {

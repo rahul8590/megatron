@@ -1,21 +1,10 @@
 function get_really_high_res_time() {
-    // browser-compatible
-    var t0,t1,delta;
     if (detect_browser != 'Safari') {
-        t0 = window.performance.now();
-        // function to be called in this 
-        t1 = window.performance.now();
-        delta = t1 - t0;
-        
+        return window.performance.now();
     }
     else {
-        t0 = Date.now();
-        //function calls which are to be executed 
-        t1 = Date.now();
-        delta = t1 - t0;
+        return Date.now();
     }
-    console.log("time taken to execute is:"+delta);
-    return delta;
 }
 
 function log_call(caller, callee, thunk) {
@@ -24,7 +13,7 @@ function log_call(caller, callee, thunk) {
 	exit: 0,
 	from: caller,
 	to: callee, // function took exit - entry time units
-    }
+    };
 
     console.log(">>>call from " + caller + " to " + callee);
     console.log(">>>entering " + name);
@@ -33,7 +22,7 @@ function log_call(caller, callee, thunk) {
     call.exit = get_really_high_res_time();
     console.log(">>>exiting "+ callee);
     
-    // do something with call
+    console.log(call);
     
     return ret;
 }

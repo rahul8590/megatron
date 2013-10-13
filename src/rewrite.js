@@ -38,8 +38,26 @@ function instrument_calls(node, ctx) {
     if (node.type != "CallExpression")
 	return node;
     
+    function get_callee_name(callee) {
+	switch (callee.type) {
+	case "Identifier":
+	    return callee.name;
+	    
+	case "FunctionExpression":
+	    return ("__anonymous_function_" + ctx.function + 
+		    "#" + callee.loc.start.line);
+
+	case "MemberExpression":
+	    return (get_callee_name(callee.object) + "." + 
+		    get_callee_name(callee.property));
+
+	default:
+	    return "error, bro";
+	}
+    }
+
     var args = [visit.make_literal(ctx.function),
-		node.callee,
+		visit.make_literal(get_callee_name(node.callee)),
 		visit.make_thunk(node)];
     return visit.make_call('log_call', args);
 }

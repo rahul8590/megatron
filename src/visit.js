@@ -135,8 +135,7 @@ function visit(ast, visitors, context, debug) {
 	break;
 
     case "FunctionExpression":
-	var new_context = {function: ("anonymous function in " + 
-				      context.function)};
+	var new_context = {function: "anonym_func:" + ast.loc.start.line};
 	ast.body = evisit(ast.body, new_context);
 	ast.defaults = ast.defaults.map(curry_evisit(new_context));
 	break;

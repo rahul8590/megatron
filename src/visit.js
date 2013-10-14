@@ -6,6 +6,7 @@
  */
 
 var assert = require('assert');
+var util = require('util');
 
 module.exports = {
     visit: function(a, v) {return visit(a, v, 
@@ -52,8 +53,6 @@ function visit(ast, visitors, context, debug) {
     
     debug("Visiting a statement of type " + ast.type);
 
-    // apply each visitor to the current AST
-    ast = visitors.reduce(apply_visitor, ast);
 
     // figure out how to recurse
     switch (ast.type) {
@@ -136,7 +135,8 @@ function visit(ast, visitors, context, debug) {
 	break;
 
     case "FunctionExpression":
-	var new_context = {function: "anonymous function in " + context.function};
+	var new_context = {function: ("anonymous function in " + 
+				      context.function)};
 	ast.body = evisit(ast.body, new_context);
 	ast.defaults = ast.defaults.map(curry_evisit(new_context));
 	break;
@@ -223,6 +223,8 @@ function visit(ast, visitors, context, debug) {
     default: 
 	break;
     }
+    // apply each visitor to the current AST
+    ast = visitors.reduce(apply_visitor, ast);
     return ast;
 }
 

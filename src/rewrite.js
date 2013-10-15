@@ -13,6 +13,10 @@ var visit = require('./visit.js');
 var assert = require('assert');
 var util = require('util');
 
+function debug(s) {
+    console.error(s);
+}
+
 function find_functions(node, ctx) {
     if (node.type != "FunctionDeclaration") {
 	return node;
@@ -37,6 +41,8 @@ function find_calls(node, ctx) {
 function instrument_calls(node, ctx) {
     if (node.type != "CallExpression")
 	return node;
+
+    debug("Instrumenting call to " + node.callee.type);
     
     function get_callee_name(callee) {
 	switch (callee.type) {
@@ -77,7 +83,7 @@ function profile(program_string, debug) {
 
 if(require.main === module) { 
     console.log(profile(fs.readFileSync(process.argv[2]), 
-		       debug=true)); 
+		       false)); 
 }
 
 module.exports = {

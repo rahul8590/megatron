@@ -96,7 +96,7 @@ function visit(ast, visitors, context, show_debug) {
     case "Function":
     case "ForStatement":
 	ast.init = evisit(ast.init, context);
-	ast.update = evisit(ast.init, context);
+	ast.update = evisit(ast.update, context);
 	// fall through
     case "WhileStatement":
     case "DoWhileStatement":

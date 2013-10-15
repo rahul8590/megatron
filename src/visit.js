@@ -27,15 +27,15 @@ module.exports = {
  * visitor. Replace the node in the AST with the output of the final
  * visitor.
  */
-function visit(ast, visitors, context, debug) {
-    if (debug === undefined)
-	debug = false;
+function visit(ast, visitors, context, show_debug) {
+    if (show_debug === undefined)
+	show_debug = false;
     if (ast === null) 
 	return null;
     
     function debug(s) {
-	if (debug)
-	    console.log('//' + s);
+	if (show_debug)
+	    console.error(s);
     }
     
     function apply_visitor(node, f) {

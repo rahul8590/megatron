@@ -1,12 +1,14 @@
 function detect_browser() {
     
+    var browserName;
+    
     if (type window == 'undefined') {
       browserName = 'node';
     }
 
     else {
       var nAgt = navigator.userAgent;
-      var browserName  = navigator.appName;
+      browserName  = navigator.appName;
       var nameOffset,verOffset,ix;
 
       // In Opera, the true version is after "Opera" or after "Version"

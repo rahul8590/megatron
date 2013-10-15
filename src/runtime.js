@@ -1,8 +1,8 @@
 function detect_browser() {
     
     var browserName;
-    
-    if (type window == 'undefined') {
+
+    if (typeof window == 'undefined') {
       browserName = 'node';
     }
 

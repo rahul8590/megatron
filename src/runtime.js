@@ -1,33 +1,3 @@
-function get_really_high_res_time() {
-    if (detect_browser != 'Safari') {
-        return window.performance.now();
-    }
-    else {
-        return Date.now();
-    }
-}
-
-function log_call(caller, callee, thunk) {
-    var call = {
-	entry: 0, 
-	exit: 0,
-	from: caller,
-	to: callee, // function took exit - entry time units
-    };
-
-    console.log(">>>call from " + caller + " to " + callee);
-    console.log(">>>entering " + name);
-    call.entry = get_really_high_res_time();
-    var ret =  thunk();
-    call.exit = get_really_high_res_time();
-    console.log(">>>exiting "+ callee);
-    
-    console.log(call);
-    
-    return ret;
-}
-
-
 function detect_browser() {
     var nAgt = navigator.userAgent;
     var browserName  = navigator.appName;
@@ -62,4 +32,33 @@ function detect_browser() {
      }
     }
     return browserName;
+}
+
+function get_really_high_res_time() {
+    if (detect_browser() != 'Safari') {
+        return window.performance.now();
+    }
+    else {
+        return Date.now();
+    }
+}
+
+function log_call(caller, callee, thunk) {
+    var call = {
+	entry: 0, 
+	exit: 0,
+	from: caller,
+	to: callee, // function took exit - entry time units
+    };
+
+    console.log(">>>call from " + caller + " to " + callee);
+    console.log(">>>entering " + callee);
+    call.entry = get_really_high_res_time();
+    var ret =  thunk();
+    call.exit = get_really_high_res_time();
+    console.log(">>>exiting "+ callee);
+    
+    console.log(call);
+    
+    return ret;
 }

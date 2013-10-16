@@ -2,10 +2,16 @@
 
 RET=0
 
-
+run() {
+    if [ $JENKINS ]; then
+	"$@"
+    else
+	"$@" >/dev/null 2>&1
+    fi
+}
 
 for i in test/alioth/*.js; do
-    if nodejs src/rewrite.js $i >/dev/null 2>&1; then
+    if run nodejs src/rewrite.js $i; then
 	echo "Successfully rewrote $i"
     else 
 	echo "Failed on $i!"

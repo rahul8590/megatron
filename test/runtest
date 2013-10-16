@@ -14,8 +14,8 @@ for i in test/alioth/*.js; do
     if run node src/rewrite.js $i; then
 	echo "Successfully rewrote $i"
     else 
-	echo "Failed on $i!"
 	RET=$?
+	echo "Failed on $i!"
     fi;
 done
 exit $RET

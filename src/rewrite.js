@@ -55,6 +55,11 @@ function instrument_calls(node, ctx) {
 	    return (get_callee_name(callee.object) + "." + 
 		    get_callee_name(callee.property));
 
+
+	case "CallExpression":
+	    debug(util.inspect(callee.loc, {depth: null}));
+	    return "call:" + callee.loc.start.line + ":" + callee.loc.start.col;
+
 	default:
 	    debug("Can't handle callee object of type: " + callee.type);
 	    debug(escodegen.generate(node));
@@ -66,7 +71,7 @@ function instrument_calls(node, ctx) {
     var args = [visit.make_literal(ctx.function),
 		visit.make_literal(get_callee_name(node.callee)),
 		visit.make_thunk(node)];
-    return visit.make_call('log_call', args);
+    return visit.make_call('log_call', args, node.loc);
 }
 
 function profile(program_string, debug) {

@@ -52,6 +52,51 @@ function function_table() {
     return ret;
 }
 
+/*
+ * A visitor that rewrites functions to have only one return value,
+ * and to return a hash of the interface:
+ * { __megatron_ret: return value,
+ *   __megatron_func_id: an identifier for the call graph}
+ */ 
+function rewrite_returns(node, ctx) {
+    if (node.type != "FunctionDeclaration" && 
+	node.type != "FunctionExpression") 
+	return node;
+    var return_obj_name   = "__megatron_ret";
+    var return_field_name = "__megatron_ret";
+    var funcid_field_name = "__megatron_function_id";
+    var return_obj_init;
+    var funcid;
+    
+    if (node.type == 'FunctionDeclaration') 
+	funcid = node.id.name;
+    else
+	funcid = (ctx.function + "__anonym:" + 
+		  node.loc.start.line + ":" + node.loc.start.column)
+    return_obj_init = visit.make_objexp([
+	{key: funcid_field_name, val: visit.make_literal(funcid)}]);
+
+    var return_decl = visit.make_decl(return_obj_name, 
+				      return_obj_init, node.loc);
+    var return_stmt = visit.make_ret(visit.make_id(return_obj_name));
+
+    // rewrite all returns to assignments to
+    // return_obj_name.return_field_name
+    function replace_returns(node, ctx) {
+	if (node.type != "ReturnStatement")
+	    return node;
+	
+	var lhs = visit.make_member(return_obj_name, return_field_name,
+			      node.loc);
+	var rhs = node.argument;
+	return visit.make_expst(visit.make_assign(lhs, rhs, node.loc));
+    }
+    node.body = visit.visit(node.body, [replace_returns], {debug: true})
+    node.body.body.push(return_stmt);
+    node.body.body.unshift(return_decl);
+    return node;
+}
+
 /* 
  * A visitor that adds entry and exit instrumentation to functions.
  */ 
@@ -99,10 +144,13 @@ function profile(program_string, show_debug) {
     var ast = esprima.parse(program_string, {loc: true});
 
     var ftab = function_table();
-    visit.visit(ast, [ftab.store_functions], false);
-    
+    visit.visit(ast, [ftab.store_functions]);
 
-    var profiled_ast = visit.visit(ast, [instrument_calls], show_debug);
+    var return_wrapped_ast = visit.visit(ast, 
+					[rewrite_returns]);
+
+    var profiled_ast = return_wrapped_ast;
+	//visit.visit(ast, [instrument_calls], show_debug);
 
 
     return (fs.readFileSync('./src/runtime.js') + 

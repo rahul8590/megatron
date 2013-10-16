@@ -5,17 +5,24 @@
  * possibly-mutating callbacks on the AST. 
  */
 
-var assert = require('assert');
-var util = require('util');
+var assert  = require('assert');
+var util    = require('util');
+var esprima = require('esprima');
 
 module.exports = {
-    visit: function(a, v) {return visit(a, v, 
-					{function: "top-level"});},
+    visit: function(a, v, d) {return visit(a, v, 
+					{context: {function: "top-level"},
+					debug: d});},
     make_thunk: make_thunk,
     make_call: make_call,
     make_id: make_id,
     make_literal: make_literal,
-    make_expst: make_expst
+    make_expst: make_expst,
+    make_decl: make_declaration,
+    make_member: make_member_expr,
+    make_assign: make_assignment,
+    make_ret: make_return,
+    make_objexp: make_objexp
 };
 
 /*
@@ -27,31 +34,37 @@ module.exports = {
  * visitor. Replace the node in the AST with the output of the final
  * visitor.
  */
-function visit(ast, visitors, context, show_debug) {
-    if (show_debug === undefined)
-	show_debug = false;
-    if (ast === null) 
-	return null;
-    
+function visit(ast, visitors, optargs) {
     function debug(s) {
-	if (show_debug)
+	if (optargs.debug)
 	    console.error(s);
     }
-    
     function apply_visitor(node, f) {
 	return f(node, context);
     }
-    var evisit = function(n, c) {return visit(n, visitors, c);};
+    function evisit(n, c) {
+	return visit(n, visitors, 
+		     {context: c,
+		      debug: optargs.debug});
+    };
     function curry_evisit(c) {
 	return function (n) { return evisit(n, c); };
+    };
+    var context = optargs.context;
+
+    if (ast === null)  {
+	debug("Got a null ast, exiting");
+	return null;
     }
+
+    debug("Visiting a statement of type " + ast.type);
 
     // ignore nodes we've created
     if (ast.megatron_ignore === true) {
+	debug("Megatron-created node, bailing");
 	return ast;
     }
     
-    debug("Visiting a statement of type " + ast.type);
 
 
     // figure out how to recurse
@@ -230,8 +243,9 @@ function visit(ast, visitors, context, show_debug) {
 /*
  * Constructor for an AST node.
  */ 
-function __construct_node(loc) {
+function __construct_node(type, loc) {
     return {
+	type: type, 
 	loc: loc,
 	megatron_ignore: true
     };
@@ -241,8 +255,7 @@ function __construct_node(loc) {
  * result of that expression.
  */ 
 function make_thunk(expr, loc) {
-    var ret = __construct_node(loc);
-    ret.type = "FunctionExpression";
+    var ret = __construct_node("FunctionExpression", loc);
     ret.id = null;
     ret.params = [];
     ret.defaults = [];
@@ -267,8 +280,7 @@ function make_thunk(expr, loc) {
  * call to f with the given _args_ (an array of esprima objects).
  */ 
 function make_call(fname, args, loc) {
-    var call = __construct_node(loc);
-    call.type = "CallExpression",
+    var call = __construct_node("CallExpression", loc);
     call.callee = {
 	type: "Identifier",
 	name: fname
@@ -281,9 +293,8 @@ function make_call(fname, args, loc) {
  * Return an esprima identifier for the argument.
  */
 function make_id(x, loc) {
-    var id = __construct_node(loc);
-    id.type = "Identifier";
-    id.name = x.name;
+    var id = __construct_node("Identifier", loc);
+    id.name = x;
     return id;
 }
 
@@ -291,8 +302,7 @@ function make_id(x, loc) {
  * Return an esprima literal with the value v.
  */
 function make_literal(v, loc) {
-    var lit = __construct_node(loc);
-    lit.type = "Literal";
+    var lit = __construct_node("Literal", loc);
     lit.value = v;
     return lit;
 }
@@ -301,8 +311,57 @@ function make_literal(v, loc) {
  * Wrap an expression in an expressionstatement.
  */ 
 function make_expst(e, loc) {
-    var expst = __construct_node(loc);
+    if (!loc) 
+	loc = e.loc;
+    var expst = __construct_node("ExpressionStatement", loc);
     expst.expression = e;
-    expst.type = "ExpressionStatement";
     return expst;
+}
+
+function make_declaration(name, init, loc) {
+    var decl = __construct_node("VariableDeclaration", loc);
+    var declor = __construct_node("VariableDeclarator", loc);
+    decl.kind = "var";
+    declor.id = make_id(name);
+    declor.init = init;
+    decl.declarations = [declor];
+    return decl;
+}
+
+function make_member_expr(object_name, member_name, loc) {
+    var mexp = __construct_node("MemberExpression", loc);
+    mexp.object = make_id(object_name);
+    mexp.property = make_id(member_name);
+    return mexp;
+}
+
+function make_assignment(lhs, rhs, loc) {
+    var asexp = __construct_node("AssignmentExpression", loc);
+    asexp.operator = "=";
+    asexp.left = lhs;
+    asexp.right = rhs;
+    return asexp;
+}
+
+function make_return(arg, loc) {
+    var ret = __construct_node("ReturnStatement", loc);
+    ret.argument = arg;
+    return ret;
+}
+
+function make_property(k, v, loc) {
+    var prop = __construct_node("Property", loc);
+    prop.key = k;
+    prop.value = v;
+    return prop;
+}
+
+function make_objexp(props, loc) {
+    var ret = __construct_node("ObjectExpression", loc);
+    ret.properties = [];
+    for (var i = 0; i < props.length; i++) {
+	ret.properties.push(make_property(make_id(props[i].key, loc), 
+					  props[i].val));
+    }
+    return ret;    
 }

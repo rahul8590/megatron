@@ -45,7 +45,7 @@ function detect_browser() {
 }
 
 function get_really_high_res_time() {
-    if (detect_browser() != 'Safari' || detect_browser() != 'node') {
+    if (detect_browser() != 'Safari' && detect_browser() != 'node') {
         return window.performance.now();
     }
     else {

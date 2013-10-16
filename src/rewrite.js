@@ -42,8 +42,6 @@ function instrument_calls(node, ctx) {
     if (node.type != "CallExpression")
 	return node;
 
-    debug("Instrumenting call to " + node.callee.type);
-    
     function get_callee_name(callee) {
 	switch (callee.type) {
 	case "Identifier":
@@ -58,7 +56,10 @@ function instrument_calls(node, ctx) {
 		    get_callee_name(callee.property));
 
 	default:
-	    return "error, bro";
+	    debug("Can't handle callee object of type: " + callee.type);
+	    debug(escodegen.generate(node));
+	    debug("Exiting with errors");
+	    process.exit(1);
 	}
     }
 

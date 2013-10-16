@@ -36,6 +36,23 @@ function find_calls(node, ctx) {
 }
 
 /* 
+ * A visitor that builds a table of declared function names.
+ */
+function function_table() {
+    var ret = {}
+    ret.table = {};
+    
+    function store_functions(node, ctx) {
+	if (node.type == "FunctionDeclaration") {
+	    ret.table[node.id.name] = true;
+	}
+	return node;
+    }
+    ret.store_functions = store_functions;
+    return ret;
+}
+
+/* 
  * A visitor that adds entry and exit instrumentation to functions.
  */ 
 function instrument_calls(node, ctx) {
@@ -74,14 +91,20 @@ function instrument_calls(node, ctx) {
     return visit.make_call('log_call', args, node.loc);
 }
 
-function profile(program_string, debug) {
-    if (debug === undefined)
-	debug = false;
+function profile(program_string, show_debug) {
+    if (show_debug === undefined)
+	show_debug = false;
 
-    var handlers = [instrument_calls];
-
+  
     var ast = esprima.parse(program_string, {loc: true});
-    var profiled_ast = visit.visit(ast, handlers, debug);
+
+    var ftab = function_table();
+    visit.visit(ast, [ftab.store_functions], false);
+    
+
+    var profiled_ast = visit.visit(ast, [instrument_calls], show_debug);
+
+
     return (fs.readFileSync('./src/runtime.js') + 
 	    "// instrumented code follows \n" + 
 	    escodegen.generate(profiled_ast));

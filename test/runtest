@@ -11,7 +11,7 @@ run() {
 }
 
 for i in test/alioth/*.js; do
-    if run nodejs src/rewrite.js $i; then
+    if run node src/rewrite.js $i; then
 	echo "Successfully rewrote $i"
     else 
 	echo "Failed on $i!"

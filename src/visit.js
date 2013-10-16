@@ -230,8 +230,9 @@ function visit(ast, visitors, context, show_debug) {
 /*
  * Constructor for an AST node.
  */ 
-function __construct_node() {
+function __construct_node(loc) {
     return {
+	loc: loc,
 	megatron_ignore: true
     };
 }
@@ -239,8 +240,8 @@ function __construct_node() {
  * Given an expression from Esprima, generate a thunk that yields the
  * result of that expression.
  */ 
-function make_thunk(expr) {
-    var ret = __construct_node();
+function make_thunk(expr, loc) {
+    var ret = __construct_node(loc);
     ret.type = "FunctionExpression";
     ret.id = null;
     ret.params = [];
@@ -265,8 +266,8 @@ function make_thunk(expr) {
  * Given a function f, return an Esprima object corresponding to a
  * call to f with the given _args_ (an array of esprima objects).
  */ 
-function make_call(fname, args) {
-    var call = __construct_node();
+function make_call(fname, args, loc) {
+    var call = __construct_node(loc);
     call.type = "CallExpression",
     call.callee = {
 	type: "Identifier",
@@ -279,8 +280,8 @@ function make_call(fname, args) {
 /*
  * Return an esprima identifier for the argument.
  */
-function make_id(x) {
-    var id = __construct_node();
+function make_id(x, loc) {
+    var id = __construct_node(loc);
     id.type = "Identifier";
     id.name = x.name;
     return id;
@@ -289,8 +290,8 @@ function make_id(x) {
 /* 
  * Return an esprima literal with the value v.
  */
-function make_literal(v) {
-    var lit = __construct_node();
+function make_literal(v, loc) {
+    var lit = __construct_node(loc);
     lit.type = "Literal";
     lit.value = v;
     return lit;
@@ -299,8 +300,8 @@ function make_literal(v) {
 /* 
  * Wrap an expression in an expressionstatement.
  */ 
-function make_expst(e) {
-    var expst = __construct_node();
+function make_expst(e, loc) {
+    var expst = __construct_node(loc);
     expst.expression = e;
     expst.type = "ExpressionStatement";
     return expst;

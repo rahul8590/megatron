@@ -13,7 +13,11 @@ var visit = require('./visit.js');
 var assert = require('assert');
 var util = require('util');
 
+//The debug function should accomodate console in other browser. (support for IE)
 function debug(s) {
+	if (typeof console == "undefined") {
+    this.console = {log: function() {}};
+	}
     console.error(s);
 }
 

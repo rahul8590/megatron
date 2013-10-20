@@ -1,0 +1,41 @@
+<!--  
+The Callgraph is the page where the graph objects is send to the front end and been streamed to graph.html. The webpage will display all the graph details. 
+
+-->
+
+
+<html>
+<body>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script src="springy.js" type="text/javascript"></script>
+<script src="springyui.js" type="text/javascript"></script>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+var graph = new Springy.Graph();
+//var nodename =  graph.newNode({label:'nodename'});
+var JSON = JSON || {}; 
+var socket = io.connect('http://localhost:8590');
+
+socket.on('graph', function (data) {
+	var a = JSON.parse(data);
+	alert(a.func_name);
+	//socket.emit('ack', { recv: 'yes' });
+	graph.newEdge(graph.newNode({label: 'func1'}), graph.newNode({label: 'func2'}), {color: '#00A0B0'});
+});
+	
+jQuery(function(){
+  var springy = window.springy = jQuery('#callgraph').springy({
+    graph: graph,
+    nodeSelected: function(node){
+      console.log('Node selected: ' + JSON.stringify(node.data));
+    }
+  });
+}); 
+  
+</script>
+
+<canvas id="callgraph" width = "640" height = "500" />
+</body>
+</html>

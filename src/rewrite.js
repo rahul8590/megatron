@@ -135,17 +135,23 @@ function instrument_calls(node, ctx) {
 	    return "this";
 
 	case "BinaryExpression":
-	    return "binexp";
+	    return "<Binary Expression>";
 
 	case "ArrayExpression":
-	    return "Array";
+	    return "<Array Literal>";
 
 	case "Literal":
-	    return callee.value
+	    return "<Literal " + callee.value + ">";
 
 	case "CallExpression":
-	    debug(util.inspect(callee.loc, {depth: null}));
-	    return "call:" + callee.loc.start.line + ":" + callee.loc.start.col;
+	    return "<call:" + callee.loc.start.line + ":" + 
+		callee.loc.start.col + ">";
+
+	case "NewExpression":
+	    return "<new>";
+
+	case "ConditionalExpression":
+	    return "<dynamic conditional>";
 
 	default:
 	    debug("Can't handle callee object of type: " + callee.type);
@@ -180,7 +186,7 @@ function profile(program_string, show_debug) {
     var return_wrapped_ast = visit.visit(ast, 
     			     		[rewrite_returns]);
 
-    var profiled_ast = visit.visit(ast, [instrument_calls], show_debug);
+    var profiled_ast = visit.visit(ast, [instrument_calls], false);
 
     var final_ast = visit.visit(profiled_ast, [sanity_check], false);
 

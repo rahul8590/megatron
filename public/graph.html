@@ -20,12 +20,43 @@ var call_list = [] // List of all call objects.
 
 
 /*
+
+The Call objects are generated in the client side which needs 
+to be streamed to server side as and when generated.
 The current assumed structure of call object is 
 call = {caller: 'func1', callee: 'func2'};
-This can be changed anytime
 */
 
 
+//Dummy call objects being creeated here 
+var call = {caller: 'func1', callee: 'func2'};  // caller object info.
+var call1 = {caller: 'func3', callee: 'func4'};  // caller object info.  
+
+
+// Newly inserted code starts here 
+socket.on('init',function (data) {
+	if (data == 'start') {
+		socket.emit('gobjects',JSON.stringify(call)); 
+		socket.emit('gobjects',JSON.stringify(call1));
+		socket.emit('gobjects','end');
+	}		
+});
+
+socket.on('graph',function(data) {
+	call_list = JSON.parse(data);
+	alert(call_list.toString());
+	for (var i =0; i < call_list.length; i++)
+	{ 
+		graph.newEdge(graph.newNode({label: call_list[i].caller}), graph.newNode({label: call_list[i].callee}), {color: '#00A0B0'});
+	}
+});
+
+
+// Newly inserted code ends here 
+
+
+
+/*
 socket.on('graph', function (data) {
 	var a = JSON.parse(data);
 	call_list.push(a);	
@@ -40,9 +71,10 @@ socket.on('end',function(data) {
 		}
 	}
   });
-
+*/
 
 jQuery(function(){
+ document.getElementById('callgraph').value = null; // flushing the canvas to avoid caching of objects
   var springy = window.springy = jQuery('#callgraph').springy({
     graph: graph,
     nodeSelected: function(node){

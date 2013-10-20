@@ -68,15 +68,28 @@ function log_call(caller, callee, thunk) {
 	via: callee,
 	to: null
     };  
+    var megatron_ret, actual_ret;
 
     call.entry = get_really_high_res_time();
-    var ret = thunk();
+    megatron_ret = thunk();
     call.exit = get_really_high_res_time();
     
-    call.to = ret.__megatron_function_id;
+    if (!("__megatron_function_id" in ret)) {
+	// This can happen if the call is to an application edge
+	// (console.log, a library function, anything we don't
+	// rewrite.) In this case, we just have to assume that via is
+	// the ground truth, and return whatever we got out of the
+	// function.
+	call.to = null;
+	actual_ret = ret;
+    } else {
+	call.to = ret.__megatron_function_id;
+	actual_ret = ret.__megatron_ret;
+    }
+    
     
     // do something with the call object
     eject(call);
     
-    return ret.__megatron_ret;
+    return actual_ret;
 }

@@ -10,7 +10,7 @@ run() {
     fi
 }
 
-for i in test/alioth/*.js; do
+for i in `find test -type f -name \*.js`; do
     if run node src/rewrite.js $i; then
 	echo "Successfully rewrote $i"
     else 

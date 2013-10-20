@@ -231,7 +231,7 @@ function visit(ast, visitors, optargs) {
 	break;
 
     case "EmtpyStatement":
-    case "BreakSTatement":
+    case "BreakStatement":
     case "ContinueStatement":
     case "DebuggerStatement":
     case "ThisExpression":

@@ -74,7 +74,7 @@ socket.on('end',function(data) {
 */
 
 jQuery(function(){
- 
+ document.getElementById('callgraph').value = null; // flushing the canvas to avoid caching of objects
   var springy = window.springy = jQuery('#callgraph').springy({
     graph: graph,
     nodeSelected: function(node){

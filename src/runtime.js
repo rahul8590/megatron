@@ -53,22 +53,30 @@ function get_really_high_res_time() {
     }
 }
 
+/*
+ * Send the call object to whatever storage device we're using.
+ */ 
+function eject(call) {
+    console.log(call);
+}
+
 function log_call(caller, callee, thunk) {
     var call = {
 	entry: 0, 
 	exit: 0,
 	from: caller,
-	to: callee, // function took exit - entry time units
-    };
+	via: callee,
+	to: null
+    };  
 
-    console.log(">>>call from " + caller + " to " + callee);
-    console.log(">>>entering " + callee);
     call.entry = get_really_high_res_time();
-    var ret =  thunk();
+    var ret = thunk();
     call.exit = get_really_high_res_time();
-    console.log(">>>exiting "+ callee);
     
-    console.log(call);
+    call.to = ret.__megatron_function_id;
     
-    return ret;
+    // do something with the call object
+    eject(call);
+    
+    return ret.__megatron_ret;
 }

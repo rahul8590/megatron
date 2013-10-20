@@ -131,6 +131,18 @@ function instrument_calls(node, ctx) {
 		    get_callee_name(callee.property));
 
 
+	case "ThisExpression":
+	    return "this";
+
+	case "BinaryExpression":
+	    return "binexp";
+
+	case "ArrayExpression":
+	    return "Array";
+
+	case "Literal":
+	    return callee.value
+
 	case "CallExpression":
 	    debug(util.inspect(callee.loc, {depth: null}));
 	    return "call:" + callee.loc.start.line + ":" + callee.loc.start.col;
@@ -168,9 +180,7 @@ function profile(program_string, show_debug) {
     var return_wrapped_ast = visit.visit(ast, 
     			     		[rewrite_returns]);
 
-    var profiled_ast = return_wrapped_ast;
-	//visit.visit(ast, [instrument_calls], show_debug);
-
+    var profiled_ast = visit.visit(ast, [instrument_calls], show_debug);
 
     var final_ast = visit.visit(profiled_ast, [sanity_check], false);
 

@@ -1,0 +1,9 @@
+Program,Arguments,Expected Time
+binary-trees.js,20,45.94
+fannkuch-redux.js,12,65.18
+fasta.js,25000000 > /dev/null,16.97
+k-nucleotide.js,0 < test/alioth/knucleotide-input.txt,0.2
+n-body.js,50000000,32.202
+regex-dna.js,0 < regexdna-input5000000.txt,0.02
+reverse-complement.js,0 < test/alioth/revcomp-input.txt >/dev/null,0.01
+spectral-norm.js,5500,15.02

@@ -37,6 +37,22 @@ function handler (req, res) {
 	if (url_parts.path == '/') {
 	path = '/public/index.html';  
 	}
+	
+	if(url_parts.path = '/profile' && req.method == 'POST') {
+		req.on('data',function(chunk){
+				post_data += chunk.toString();
+			});
+			req.on('end',function() {
+			var decbody = querystring.parse(post_data);
+			console.log("===============");
+			console.log(decbody.code);
+			console.log("===============");
+			var code_profile = profile.profile(decbody.code);
+			data = code_profile;
+			res.writeHead(200);
+			res.end(data);
+		});
+	}
 	 
  
 	 
@@ -56,7 +72,7 @@ function handler (req, res) {
 			console.log(decbody.code);
 			console.log("===============");
 			var code_profile = profile.profile(decbody.code);
-			data = code_profile;
+			res.write(code_profile);
 			});
 		}
 		

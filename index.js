@@ -2,7 +2,8 @@ var app = require('http').createServer(handler)
   , io = require('socket.io').listen(app)
   , fs = require('fs')
   , url = require('url')
-  , querystring = require('querystring');
+  , querystring = require('querystring')
+  , profile = require('./src/rewrite.js');
 
 app.listen(8590);
 
@@ -54,6 +55,8 @@ function handler (req, res) {
 			console.log("===============");
 			console.log(decbody.code);
 			console.log("===============");
+			var code_profile = profile.profile(decbody.code);
+			req.reply(code_profile);
 			});
 		}
 		

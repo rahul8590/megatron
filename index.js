@@ -65,10 +65,23 @@ function handler (req, res) {
 io.sockets.on('connection', function (socket) {
 	// Adding Sample Call object which I will receive from another function
 	// Server will emit graph signal to FE and send the call object.
-	var call = {func_name: 'world'};
+	//var call = {func_name: 'world'};
+	//socket.emit('graph', JSON.stringify(call));
+	
+	
+	var call = {caller: 'func1', callee: 'func2'};  // caller object info.
+	var call1 = {caller: 'func3', callee: 'func4'};  // caller object info.
 	socket.emit('graph', JSON.stringify(call));
+	//setTimeout(function(){},2000);
+	socket.emit('graph', JSON.stringify(call1));
+	
+	
 	//socket.on('ack', function (data) {
     //console.log(data);
+    
+    // When all the graph objects are sent. final end connection signal.
+    var end = {status:'complete'} ;
+	socket.emit('end',JSON.stringify(end));
   });
 
 

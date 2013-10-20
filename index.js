@@ -88,7 +88,6 @@ io.sockets.on('connection', function (socket) {
 	
 	socket.emit('init','start');
 	socket.on('gobjects',function(data) {
-	
 	console.log(data);
 	if (data == 'end') {
 			for (var i = 0; i<server_list.length; i++) {

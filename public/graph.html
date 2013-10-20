@@ -25,7 +25,7 @@ The Call objects are generated in the client side which needs
 to be streamed to server side as and when generated.
 The current assumed structure of call object is 
 call = {caller: 'func1', callee: 'func2'};
-*/
+
 
 
 //Dummy call objects being creeated here 
@@ -41,8 +41,10 @@ socket.on('init',function (data) {
 		socket.emit('gobjects','end');
 	}		
 });
+*/
 
 socket.on('graph',function(data) {
+	socket.emit('gobjects','end');
 	call_list = JSON.parse(data);
 	alert(call_list.toString());
 	for (var i =0; i < call_list.length; i++)

@@ -1,3 +1,8 @@
+<script src="/socket.io/socket.io.js"></script>
+
+var socket = io.connect('http://localhost:8590');
+
+
 function detect_browser() {
     
     var browserName;
@@ -58,6 +63,12 @@ function get_really_high_res_time() {
  */ 
 function eject(call) {
     console.log(call);
+    socket.on('init',function (data) {
+	if (data == 'start') {
+		socket.emit('gobjects',JSON.stringify(call)); 
+		//socket.emit('gobjects','end');
+	}		
+});
 }
 
 function log_call(caller, callee, thunk) {

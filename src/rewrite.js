@@ -114,7 +114,7 @@ function rewrite_returns(node, ctx) {
  * A visitor that adds entry and exit instrumentation to functions.
  */ 
 function instrument_calls(node, ctx) {
-    if (node.type != "CallExpression")
+    if (node.type != "CallExpression" && node.type != "NewExpression")
 	return node;
 
     function get_callee_name(callee) {
@@ -148,7 +148,7 @@ function instrument_calls(node, ctx) {
 		callee.loc.start.col + ">";
 
 	case "NewExpression":
-	    return "<new>";
+	    return "<new " + get_callee_name(callee.callee) + ">";
 
 	case "ConditionalExpression":
 	    return "<dynamic conditional>";

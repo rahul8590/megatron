@@ -62,6 +62,9 @@ function handler (req, res) {
 	});
 }
 
+// Maintains list of all the objects which is stremed by client
+var server_list = []
+
 io.sockets.on('connection', function (socket) {
 	// Adding Sample Call object which I will receive from another function
 	// Server will emit graph signal to FE and send the call object.
@@ -69,19 +72,36 @@ io.sockets.on('connection', function (socket) {
 	//socket.emit('graph', JSON.stringify(call));
 	
 	
-	var call = {caller: 'func1', callee: 'func2'};  // caller object info.
-	var call1 = {caller: 'func3', callee: 'func4'};  // caller object info.
-	socket.emit('graph', JSON.stringify(call));
+	//var call = {caller: 'func1', callee: 'func2'};  // caller object info.
+	//var call1 = {caller: 'func3', callee: 'func4'};  // caller object info.
+	//socket.emit('graph', JSON.stringify(call));
 	//setTimeout(function(){},2000);
-	socket.emit('graph', JSON.stringify(call1));
+	//socket.emit('graph', JSON.stringify(call1));
 	
 	
 	//socket.on('ack', function (data) {
     //console.log(data);
     
     // When all the graph objects are sent. final end connection signal.
-    var end = {status:'complete'} ;
-	socket.emit('end',JSON.stringify(end));
-  });
+    //var end = {status:'complete'} ;
+	//socket.emit('end',JSON.stringify(end));
+	
+	socket.emit('init','start');
+	socket.on('gobjects',function(data) {
+	
+	console.log(data);
+	if (data == 'end') {
+			for (var i = 0; i<server_list.length; i++) {
+				console.log(server_list[i].caller);
+			}
+			socket.emit('graph',JSON.stringify(server_list));
+			server_list = []; // flushing the server list so refresh will purge old objects
+		}
+	else {
+			server_list.push(JSON.parse(data)) ;
+		}
+	
+	});
+});
 
 

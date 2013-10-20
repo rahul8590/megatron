@@ -100,7 +100,9 @@ function rewrite_returns(node, ctx) {
 	}
 	assert.notEqual(rhs, null);
 	assert.notEqual(lhs, null);
-	return visit.make_expst(visit.make_assign(lhs, rhs, node.loc));
+	return visit.make_block(
+	    [visit.make_expst(visit.make_assign(lhs, rhs, node.loc)),
+	    return_stmt]);
     }
     node.body = visit.visit(node.body, [replace_returns], {debug: true})
     node.body.body.push(return_stmt);

@@ -22,7 +22,8 @@ module.exports = {
     make_member: make_member_expr,
     make_assign: make_assignment,
     make_ret: make_return,
-    make_objexp: make_objexp
+    make_objexp: make_objexp,
+    make_block: make_block
 };
 
 /*
@@ -390,4 +391,10 @@ function make_objexp(props, loc) {
 					  props[i].val));
     }
     return ret;    
+}
+
+function make_block(stmts, loc) {
+    var bl = __construct_node("BlockStatement", loc);
+    bl.body = stmts;
+    return bl;
 }

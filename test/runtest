@@ -6,13 +6,26 @@ run() {
     if [ $JENKINS ]; then
 	"$@"
     else
-	"$@" >/dev/null 2>&1
+	"$@" >tmp.js 2>/dev/null
     fi
 }
 
 for i in `find test -type f -name \*.js`; do
     if run node src/rewrite.js $i; then
-	echo "Successfully rewrote $i"
+	str="Successfully rewrote"
+	if [[ $i =~ "alioth" ]]; then
+	    run=/bin/echo
+	else
+	    run="nodejs"
+	fi
+	if $run tmp.js >/dev/null 2>&1; then
+	    str="$str and ran"
+	else
+	    RET=$?
+	    str="$str but couldn't run"
+	fi 
+	rm tmp.js
+	echo "$str $i."
     else 
 	RET=$?
 	echo "Failed on $i!"

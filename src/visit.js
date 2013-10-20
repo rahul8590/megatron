@@ -22,7 +22,8 @@ module.exports = {
     make_member: make_member_expr,
     make_assign: make_assignment,
     make_ret: make_return,
-    make_objexp: make_objexp
+    make_objexp: make_objexp,
+    make_block: make_block
 };
 
 /*
@@ -54,7 +55,7 @@ function visit(ast, visitors, optargs) {
 
     if (ast === null)  {
 	debug("Got a null ast, exiting");
-	return null;
+	return ast;
     }
 
     debug("Visiting a statement of type " + ast.type);
@@ -209,6 +210,11 @@ function visit(ast, visitors, optargs) {
 	ast.blocks = ast.blocks.map(curry_evisit(context));
 	ast.filter = evisit(ast.filter, context);
 	break;
+
+    case "NewExpression":
+	ast.callee = evisit(ast.callee, context);
+	ast.arguments = ast.arguments.map(curry_evisit(context));
+	break;
 	
     case "LabeledStatement":
 	ast.body = evisit(ast.body, context);
@@ -226,18 +232,39 @@ function visit(ast, visitors, optargs) {
 	break;
 
     case "EmtpyStatement":
-    case "BreakSTatement":
+    case "BreakStatement":
     case "ContinueStatement":
     case "DebuggerStatement":
     case "ThisExpression":
     case "Identifier":
     case "GraphExpression":
+    case "Literal":
+	break
+
     default: 
+	console.error("Unhandled case of type " + ast.type);
+	process.exit(1);
 	break;
     }
     // apply each visitor to the current AST
     ast = visitors.reduce(apply_visitor, ast);
     return ast;
+}
+
+function sanitize_graph(ast) {
+    if (ast.type === null) {
+	console.error("Null typed node!");
+	console.error(util.inspect(ast, {depth: null}));
+	process.exit(255);
+    }
+    
+    for (field in ast) {
+	try {
+	    if ("type" in ast.field) {
+		sanitize_graph(ast.field);
+	    }
+	} catch (TypeError) {}
+    }
 }
 
 /*
@@ -364,4 +391,10 @@ function make_objexp(props, loc) {
 					  props[i].val));
     }
     return ret;    
+}
+
+function make_block(stmts, loc) {
+    var bl = __construct_node("BlockStatement", loc);
+    bl.body = stmts;
+    return bl;
 }

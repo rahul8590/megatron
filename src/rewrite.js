@@ -88,7 +88,14 @@ function rewrite_returns(node, ctx) {
 	
 	var lhs = visit.make_member(return_obj_name, return_field_name,
 			      node.loc);
-	var rhs = node.argument;
+	var rhs;
+	if (node.argument === null) {
+	    rhs = visit.make_literal(null);
+	} else {
+	    rhs = node.argument;
+	}
+	assert.notEqual(rhs, null);
+	assert.notEqual(lhs, null);
 	return visit.make_expst(visit.make_assign(lhs, rhs, node.loc));
     }
     node.body = visit.visit(node.body, [replace_returns], {debug: true})
@@ -136,6 +143,12 @@ function instrument_calls(node, ctx) {
     return visit.make_call('log_call', args, node.loc);
 }
 
+function sanity_check(ast, ctx) {
+    assert.notEqual(ast.type, null);
+    assert.notDeepEqual(ast.type, null);
+    return ast;
+}
+
 function profile(program_string, show_debug) {
     if (show_debug === undefined)
 	show_debug = false;
@@ -147,11 +160,13 @@ function profile(program_string, show_debug) {
     visit.visit(ast, [ftab.store_functions]);
 
     var return_wrapped_ast = visit.visit(ast, 
-					[rewrite_returns]);
+    			     		[rewrite_returns]);
 
     var profiled_ast = return_wrapped_ast;
 	//visit.visit(ast, [instrument_calls], show_debug);
 
+
+    var final_ast = visit.visit(profiled_ast, [sanity_check], false);
 
     return (fs.readFileSync('./src/runtime.js') + 
 	    "// instrumented code follows \n" + 

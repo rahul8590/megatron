@@ -56,7 +56,7 @@ function handler (req, res) {
 			console.log(decbody.code);
 			console.log("===============");
 			var code_profile = profile.profile(decbody.code);
-			req.reply(code_profile);
+			data = code_profile;
 			});
 		}
 		

@@ -251,22 +251,6 @@ function visit(ast, visitors, optargs) {
     return ast;
 }
 
-function sanitize_graph(ast) {
-    if (ast.type === null) {
-	console.error("Null typed node!");
-	console.error(util.inspect(ast, {depth: null}));
-	process.exit(255);
-    }
-    
-    for (field in ast) {
-	try {
-	    if ("type" in ast.field) {
-		sanitize_graph(ast.field);
-	    }
-	} catch (TypeError) {}
-    }
-}
-
 /*
  * Constructor for an AST node.
  */ 

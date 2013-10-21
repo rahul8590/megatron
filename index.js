@@ -117,16 +117,23 @@ function handler (req, res) {
 }
 
 // Maintains list of all the objects which is stremed by client
-var server_list = []
+var server_list = [];
 
 io.sockets.on('connection', function (socket) {
+	
 	socket.emit('init','start');
 	socket.on('gobjects',function(data) {
 	console.log(data);
-	if (data == 'end') {
-			console.log("end signal received");
+	if (data == 'send') {
+			console.log("send signal received");
 			socket.emit('graph',JSON.stringify(server_list));
-			//server_list = []; // flushing the server list so refresh will purge old objects
+			console.log("from index.js after sending server_list is " + server_list.length);
+			//server_list.splice(0,server_list.length); // flushing the server list so refresh will purge old objects
+			//console.log("After Splicing " + server_list.length);	
+		}
+	else if (data =='clear') {
+			server_list.splice(0,server_list.length); // flushing the server list so refresh will purge old objects
+			console.log("After Splicing " + server_list.length);	
 		}
 	else {
 			var obj = JSON.parse(data);

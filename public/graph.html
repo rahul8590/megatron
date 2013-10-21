@@ -6,19 +6,31 @@ The Callgraph is the page where the graph objects is send to the front end and b
 
 <html>
 <body>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script> 
 <script src="springy.js" type="text/javascript"></script>
 <script src="springyui.js" type="text/javascript"></script>
-
+-->
+<script type="text/javascript" src="raphael-min.js"></script>
+<script type="text/javascript" src="dracula_graffle.js"></script>
+<script type="text/javascript" src="jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="dracula_graph.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 
 <script>
-var graph = new Springy.Graph();
+
+
+	
+	
+//var graph = new Springy.Graph();
 var JSON = JSON || {}; 
 var socket = io.connect('http://localhost:8590');
 var call_list = [] // List of all call objects.
 
+var redraw, g, renderer;
+var width = $(document).width() - 900;
+var height = $(document).height() - 100;
 
+console.log(width+' ' + height);
 /*
 
 The Call objects are generated in the client side which needs 
@@ -29,8 +41,7 @@ call = {caller: 'func1', callee: 'func2'};
 
 
 //Dummy call objects being creeated here 
-var call = {caller: 'func1', callee: 'func2'};  // caller object info.
-var call1 = {caller: 'func3', callee: 'func4'};  // caller object info.  
+var call = {"entry":190.2750000008382,"exit":190.38500000169734,"from":"b","via":"a","to":"a"}
 
 
 // Newly inserted code starts here 
@@ -42,16 +53,65 @@ socket.on('init',function (data) {
 	}		
 });
 */
-
-socket.on('graph',function(data) {
+socket.on('init',function (data) {
 	socket.emit('gobjects','end');
+});
+
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}
+
+
+
+g = new Graph();	
+var obj;
+var nodes = [];
+socket.on('graph',function(data) {
+	//socket.emit('gobjects','end');
 	call_list = JSON.parse(data);
-	alert(call_list.toString());
+	
+	//alert(call_list.toString());
 	for (var i =0; i < call_list.length; i++)
 	{ 
-		graph.newEdge(graph.newNode({label: call_list[i].caller}), graph.newNode({label: call_list[i].callee}), {color: '#00A0B0'});
+		obj = JSON.parse(call_list[i]);	
+		console.log(obj.from + ' ' + obj.to);
+		g.addEdge(obj.from,obj.to, {directed: true});
 	}
+	var layouter = new Graph.Layout.Spring(g);
+		layouter.layout(); 
+		renderer = new Graph.Renderer.Raphael('canvas', g, width, height);
+		renderer.draw();
 });
+
+//g.addEdge("a","b", {directed: true});
+//window.onload = function() {
+//sleep(1000);
+window.onload = function () {	
+/* layout the graph using the Spring layout implementation */
+  //var layouter = new Graph.Layout.Spring(g);
+  //layouter.layout(); 
+   /* draw the graph using the RaphaelJS draw implementation */
+   //renderer = new Graph.Renderer.Raphael('canvas', g, width, height);
+   //renderer.draw();
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // Newly inserted code ends here 
@@ -73,7 +133,7 @@ socket.on('end',function(data) {
 		}
 	}
   });
-*/
+
 
 jQuery(function(){
  document.getElementById('callgraph').value = null; // flushing the canvas to avoid caching of objects
@@ -84,9 +144,14 @@ jQuery(function(){
     }
   });
 }); 
+*/
+
+
+
   
 </script>
 
-<canvas id="callgraph" width = "640" height = "500" />
+<div id="canvas"> </div>
+
 </body>
 </html>

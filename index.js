@@ -74,16 +74,18 @@ function handler (req, res) {
 			console.log("===============");
 			var code_profile = profile.profile(decbody.code);
 			data = code_profile;
-			fs.writeFile(__dirname+'/public/rewrite.html','<script src="/socket.io/socket.io.js"></script><script>'+code_profile+'</script>',function(err) {
+			fs.writeFile(__dirname+'/public/rewrite.html','<script src="/socket.io/socket.io.js"></script><script>'+code_profile+'</script><body></body>',function(err) {
 				if (err) {
-					console.log(err + "cannot wrtite to rewrite.html");
+					console.log(err + "cannot write to rewrite.html");
 				}
 				else {
 					console.log(" sucessfully rewrite.html ");
+					
 				}
 			});
-			res.writeHead(200);
-			res.end(data);
+			res.writeHead(302,{'Location': '/rewrite'});
+			res.end();
+			//res.end(data);
 		});
 	}
 	 

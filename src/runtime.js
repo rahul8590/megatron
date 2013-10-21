@@ -1,4 +1,4 @@
-<script src="/socket.io/socket.io.js"></script>
+
 
 var socket = io.connect('http://localhost:8590');
 

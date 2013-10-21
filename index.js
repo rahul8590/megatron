@@ -38,6 +38,11 @@ function handler (req, res) {
 	path = '/public/index.html';  
 	}
 	
+	if (url_parts.path == '/rewrite') {
+	path = '/public/rewrite.html';  
+	}
+	
+	
 	if(url_parts.path = '/profile' && req.method == 'POST') {
 		req.on('data',function(chunk){
 				post_data += chunk.toString();
@@ -49,6 +54,14 @@ function handler (req, res) {
 			console.log("===============");
 			var code_profile = profile.profile(decbody.code);
 			data = code_profile;
+			fs.writeFile(__dirname+'/public/rewrite.html','<script src="/socket.io/socket.io.js"></script><script>'+code_profile+'</script>',function(err) {
+				if (err) {
+					console.log(err + "cannot wrtite to rewrite.html");
+				}
+				else {
+					console.log(" sucessfully rewrite.html ");
+				}
+			});
 			res.writeHead(200);
 			res.end(data);
 		});

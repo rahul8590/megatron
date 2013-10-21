@@ -57,13 +57,14 @@ function get_really_high_res_time() {
  * Send the call object to whatever storage device we're using.
  */ 
 function eject(call) {
-    if (detect_browser() == 'd8')
-	print(call);
+    if (detect_browser() == 'd8') {
+	print("{ from: "+ call.from + "}");
+    }
     else
 	console.log(call);
 }
 
-function log_call(caller, callee, thunk, these) {
+function log_call(caller, callee, thunk, these, from_new) {
     var call = {
 	entry: 0, 
 	exit: 0,
@@ -97,5 +98,9 @@ function log_call(caller, callee, thunk, these) {
     // do something with the call object
     eject(call);
     
-    return actual_ret;
+    if (from_new) {
+	return megatron_ret.__megatron_this;
+    } else {
+	return actual_ret;
+    }
 }

@@ -63,13 +63,19 @@ function function_table() {
  *   __megatron_func_id: an identifier for the call graph}
  */ 
 function rewrite_returns(node, ctx) {
+    var return_obj_name   = "__megatron_ret";
+    function mk_return_obj(fid, rexp) {
+	var return_field_name = "__megatron_ret";
+	var funcid_field_name = "__megatron_function_id";
+	return visit.make_objexp([
+	    {key: funcid_field_name, val: visit.make_literal(fid)},
+	    {key: return_field_name, val: rexp}
+	]);
+    }
+    
     if (node.type != "FunctionDeclaration" && 
 	node.type != "FunctionExpression") 
 	return node;
-    var return_obj_name   = "__megatron_ret";
-    var return_field_name = "__megatron_ret";
-    var funcid_field_name = "__megatron_function_id";
-    var return_obj_init;
     var funcid;
     
     if (node.type == 'FunctionDeclaration') 
@@ -77,9 +83,8 @@ function rewrite_returns(node, ctx) {
     else
 	funcid = (ctx.function + "__anonym:" + 
 		  node.loc.start.line + ":" + node.loc.start.column)
-    return_obj_init = visit.make_objexp([
-	{key: funcid_field_name, val: visit.make_literal(funcid)}]);
 
+    var return_obj_init = mk_return_obj(funcid, visit.make_literal(null));
     var return_decl = visit.make_decl(return_obj_name, 
 				      return_obj_init, node.loc);
     var return_stmt = visit.make_ret(visit.make_id(return_obj_name));
@@ -90,8 +95,6 @@ function rewrite_returns(node, ctx) {
 	if (node.type != "ReturnStatement")
 	    return node;
 	
-	var lhs = visit.make_member(return_obj_name, return_field_name,
-			      node.loc);
 	var rhs;
 	if (node.argument === null) {
 	    rhs = visit.make_literal(null);
@@ -99,10 +102,8 @@ function rewrite_returns(node, ctx) {
 	    rhs = node.argument;
 	}
 	assert.notEqual(rhs, null);
-	assert.notEqual(lhs, null);
-	return visit.make_block(
-	    [visit.make_expst(visit.make_assign(lhs, rhs, node.loc)),
-	    return_stmt]);
+	var rewritten_return = visit.make_ret(mk_return_obj(funcid, rhs));
+	return rewritten_return;
     }
     node.body = visit.visit(node.body, [replace_returns], {debug: true})
     node.body.body.push(return_stmt);
@@ -163,7 +164,9 @@ function instrument_calls(node, ctx) {
 
     var args = [visit.make_literal(ctx.function),
 		visit.make_literal(get_callee_name(node.callee)),
-		visit.make_thunk(node)];
+		visit.make_thunk(node),
+		visit.make_this(node.loc)
+	       ];
     return visit.make_call('log_call', args, node.loc);
 }
 

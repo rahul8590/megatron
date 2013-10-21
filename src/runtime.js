@@ -1,6 +1,5 @@
 
 
-var socket = io.connect('http://localhost:8590');
 
 
 function detect_browser() {
@@ -63,15 +62,9 @@ function get_really_high_res_time() {
  */ 
 function eject(call) {
     console.log(call);
-    socket.on('init',function (data) {
-	if (data == 'start') {
-		socket.emit('gobjects',JSON.stringify(call)); 
-		//socket.emit('gobjects','end');
-	}		
-});
 }
 
-function log_call(caller, callee, thunk) {
+function log_call(caller, callee, thunk, these) {
     var call = {
 	entry: 0, 
 	exit: 0,
@@ -82,11 +75,12 @@ function log_call(caller, callee, thunk) {
     var megatron_ret, actual_ret;
 
     call.entry = get_really_high_res_time();
-    megatron_ret = thunk();
+    megatron_ret = thunk.call(these);
     call.exit = get_really_high_res_time();
     
-    if (megatron_ret === null || megatron_ret == NaN || 
-	megatron_ret === undefined || 
+    if ((typeof megatron_ret != "object" && 
+	 typeof megatron_ret != "function") ||
+	megatron_ret === null ||
 	!("__megatron_function_id" in megatron_ret)) {
 	// This can happen if the call is to an application edge
 	// (console.log, a library function, anything we don't

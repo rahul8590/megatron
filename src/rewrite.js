@@ -164,7 +164,9 @@ function instrument_calls(node, ctx) {
 
     var args = [visit.make_literal(ctx.function),
 		visit.make_literal(get_callee_name(node.callee)),
-		visit.make_thunk(node)];
+		visit.make_thunk(node),
+		visit.make_this(node.loc)
+	       ];
     return visit.make_call('log_call', args, node.loc);
 }
 

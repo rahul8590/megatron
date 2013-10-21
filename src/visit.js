@@ -23,7 +23,8 @@ module.exports = {
     make_assign: make_assignment,
     make_ret: make_return,
     make_objexp: make_objexp,
-    make_block: make_block
+    make_block: make_block,
+    make_this: make_this
 };
 
 /*
@@ -381,4 +382,8 @@ function make_block(stmts, loc) {
     var bl = __construct_node("BlockStatement", loc);
     bl.body = stmts;
     return bl;
+}
+
+function make_this(loc) {
+    return __construct_node("ThisExpression", loc);
 }

@@ -4,7 +4,7 @@ ${MEGATRON_HOME}/test/alioth/fannkuch-redux.js,12,65.18,/home/tedks/Source/v8/ou
 ${MEGATRON_HOME}/test/alioth/fasta.js,25000000 > /dev/null,16.97,/home/tedks/Source/v8/out/native/d8
 ${MEGATRON_HOME}/test/alioth/k-nucleotide.js,0 < ${MEGATRON_HOME}/test/alioth/knucleotide-input.txt,0.2,/home/tedks/Source/v8/out/native/d8
 ${MEGATRON_HOME}/test/alioth/n-body.js,50000000,32.202,/home/tedks/Source/v8/out/native/d8
-${MEGATRON_HOME}/test/alioth/regex-dna.js,0 < regexdna-input5000000.txt,0.02,/home/tedks/Source/v8/out/native/d8
+${MEGATRON_HOME}/test/alioth/regex-dna.js,0 < ${MEGATRON_HOME}/test/alioth/regexdna-input.txt,0.02,/home/tedks/Source/v8/out/native/d8
 ${MEGATRON_HOME}/test/alioth/reverse-complement.js,0 < ${MEGATRON_HOME}/test/alioth/revcomp-input.txt >/dev/null,0.01,/home/tedks/Source/v8/out/native/d8
 ${MEGATRON_HOME}/test/alioth/spectral-norm.js,5500,15.02,/home/tedks/Source/v8/out/native/d8
 ${MEGATRON_HOME}/test/calleecallexpression.js,,,nodejs

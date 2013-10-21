@@ -1,6 +1,5 @@
 <!--  
 The Callgraph is the page where the graph objects is send to the front end and been streamed to graph.html. The webpage will display all the graph details. 
-
 -->
 
 
@@ -24,11 +23,11 @@ The Callgraph is the page where the graph objects is send to the front end and b
 //var graph = new Springy.Graph();
 var JSON = JSON || {}; 
 var socket = io.connect('http://localhost:8590');
-var call_list = [] // List of all call objects.
+//var call_list = [] // List of all call objects.
 
 var redraw, g, renderer;
-var width = $(document).width() - 900;
-var height = $(document).height() - 100;
+var width = $(document).width();
+var height = $(document).height();
 
 console.log(width+' ' + height);
 /*
@@ -68,19 +67,31 @@ function sleep(milliseconds) {
 
 
 
-g = new Graph();	
-var obj;
-var nodes = [];
+var nodes = {}; // creates a node list of to and from function	
 socket.on('graph',function(data) {
 	//socket.emit('gobjects','end');
-	call_list = JSON.parse(data);
+	var obj;
+	g = new Graph();
+	var call_list = JSON.parse(data);
 	
 	//alert(call_list.toString());
 	for (var i =0; i < call_list.length; i++)
 	{ 
 		obj = JSON.parse(call_list[i]);	
 		console.log(obj.from + ' ' + obj.to);
-		g.addEdge(obj.from,obj.to, {directed: true});
+		if (nodes[obj.from]) {
+			if (nodes[obj.from] != obj.to)
+			{
+				g.addEdge(obj.from,obj.to, {directed: true});
+				nodes[obj.from] = obj.to;
+			}
+			else { continue; }
+		}
+		else if (!nodes[obj.from]) {
+			g.addEdge(obj.from,obj.to, {directed: true});
+			nodes[obj.from] = obj.to;
+		}
+			
 	}
 	var layouter = new Graph.Layout.Spring(g);
 		layouter.layout(); 
@@ -92,6 +103,7 @@ socket.on('graph',function(data) {
 //window.onload = function() {
 //sleep(1000);
 window.onload = function () {	
+	
 /* layout the graph using the Spring layout implementation */
   //var layouter = new Graph.Layout.Spring(g);
   //layouter.layout(); 

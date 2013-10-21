@@ -75,7 +75,7 @@ function log_call(caller, callee, thunk, these) {
     var megatron_ret, actual_ret;
 
     call.entry = get_really_high_res_time();
-    megatron_ret = thunk.call(these)
+    megatron_ret = thunk.call(these);
     call.exit = get_really_high_res_time();
     
     if ((typeof megatron_ret != "object" && 

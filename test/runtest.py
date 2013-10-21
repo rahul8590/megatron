@@ -6,6 +6,8 @@ TMPDIR="/tmp/megatron"
 
 def setup():
     print "Starting test run"
+    os.environ['MEGATRON_HOME'] = os.path.join(
+        os.path.abspath(os.path.dirname(sys.argv[0])), "..")
     try:
         os.mkdir(TMPDIR)
     except OSError as e:
@@ -16,39 +18,56 @@ def setup():
 
 def rewrite(filename):
     output = tempfile.NamedTemporaryFile(dir=TMPDIR, delete=False)
-    po = subprocess.Popen("nodejs src/rewrite.js {}".format(filename), 
-                         shell=True, stdout=output.file, stderr=subprocess.PIPE)
-    return (po.wait(), output.name)
+    ret = os.system("nodejs src/rewrite.js {} 2>/dev/null >{}".
+                    format(filename, output.name))
+    return (ret, output.name)
 
-def run_alioth(test):
-    pass
-
-def run_test(testname):
-    if "alioth" in testname:
-        run_alioth(test)
+def run_test(test, profiled_program_path):
+    cmdline = "{} {} {} 2>&1".format(test['runcmd'],
+                                                profiled_program_path, 
+                                                test['args'])
+    retval = os.system(cmdline)
+    return retval == 0
 
 def main():
     rewrite_fail, run_fail = [], []
     tmpfiles = []
-    test_file_name = sys.argv[1]
     total = 0
+    test_file_name = ""
+    if len(sys.argv) < 2:
+        test_file_name = sys.argv[0].replace("runtest.py", "test.csv")
+    else:
+        test_file_name = sys.argv[1]
 
     setup()
+    os.system("echo ${MEGATRON_HOME}")
 
     dr = csv.DictReader(open(test_file_name, "r"))
     for test in dr:
         total += 1
-        (ex, profiled_program) = rewrite("test/" + test['file'])
-        tmpfiles.append(profiled_program)
+        (ex, profiled_program) = rewrite(test['file'])
         if ex != 0:
-            failures.append(test.file)
+            rewrite_fail.append(test['file'])
+        x = run_test(test, profiled_program)
+        if not x:
+            run_fail.append(test['file'])
+        if x and (ex == 0):
+            tmpfiles.append(profiled_program)
+            
 
+    if len(rewrite_fail) > 0 or len(run_fail) > 0:
+        print " *** Failures! ***"
     if len(rewrite_fail) > 0:
-        print "***FAILURES:"
         for rwf in rewrite_fail:
-            print "\t* {}".format(rwf)
+            print "Failed to rewrite: {}".format(rwf)
     else:
         print "Successfully rewrote {} cases.".format(total)
+    
+    if len(run_fail) > 0:
+        for rwf in run_fail:
+            print "Failed to run: {}".format(rwf)
+    else:
+        print "Successfully ran {} cases.".format(total)
 
     for t in tmpfiles:
         os.remove(t)

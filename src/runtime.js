@@ -1,12 +1,8 @@
-
-
-
-
 function detect_browser() {
     var browserName;
 
     if (typeof window == 'undefined') {
-	if (version !== undefined && version() == "3.22.15")
+	if (typeof version != 'undefined' && version() == "3.22.15")
 	    return 'd8';
 	return 'node';
     }
@@ -47,7 +43,9 @@ function detect_browser() {
 }
 
 function get_really_high_res_time() {
-    if (detect_browser() != 'Safari' && detect_browser() != 'node') {
+    if (detect_browser() != 'Safari' && 
+	detect_browser() != 'node' &&
+	detect_browser() != 'd8') {
         return window.performance.now();
     }
     else {
@@ -59,7 +57,10 @@ function get_really_high_res_time() {
  * Send the call object to whatever storage device we're using.
  */ 
 function eject(call) {
-    console.log(call);
+    if (detect_browser() == 'd8')
+	print(call);
+    else
+	console.log(call);
 }
 
 function log_call(caller, callee, thunk, these) {

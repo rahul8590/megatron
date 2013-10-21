@@ -53,7 +53,7 @@ socket.on('init',function (data) {
 });
 */
 socket.on('init',function (data) {
-	socket.emit('gobjects','end');
+	socket.emit('gobjects','send');
 });
 
 function sleep(milliseconds) {
@@ -67,17 +67,17 @@ function sleep(milliseconds) {
 
 
 
-var nodes = {}; // creates a node list of to and from function	
+	
 socket.on('graph',function(data) {
-	//socket.emit('gobjects','end');
-	var obj;
+	
+	var nodes = {}; // creates a node list of to and from function
 	g = new Graph();
 	var call_list = JSON.parse(data);
+	console.log("in graph.html the call_list is " + call_list.length);
 	
-	//alert(call_list.toString());
 	for (var i =0; i < call_list.length; i++)
 	{ 
-		obj = JSON.parse(call_list[i]);	
+		var obj = JSON.parse(call_list[i]);	
 		console.log(obj.from + ' ' + obj.to);
 		if (nodes[obj.from]) {
 			if (nodes[obj.from] != obj.to)
@@ -93,10 +93,15 @@ socket.on('graph',function(data) {
 		}
 			
 	}
+	nodes = {};
+	sleep(1500);
+	socket.emit('gobjects' ,'clear');
 	var layouter = new Graph.Layout.Spring(g);
 		layouter.layout(); 
 		renderer = new Graph.Renderer.Raphael('canvas', g, width, height);
 		renderer.draw();
+	
+	
 });
 
 //g.addEdge("a","b", {directed: true});

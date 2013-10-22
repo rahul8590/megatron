@@ -67,8 +67,10 @@ function rewrite_returns(node, ctx) {
     function mk_return_obj(fid, rexp) {
 	var return_field_name = "__megatron_ret";
 	var funcid_field_name = "__megatron_function_id";
+	var this_field_name = "__megatron_this"
 	return visit.make_objexp([
 	    {key: funcid_field_name, val: visit.make_literal(fid)},
+	    {key: this_field_name, val: visit.make_this()},
 	    {key: return_field_name, val: rexp}
 	]);
     }
@@ -108,7 +110,7 @@ function rewrite_returns(node, ctx) {
     node.body = visit.visit(node.body, [replace_returns], {debug: true})
     node.body.body.push(return_stmt);
     node.body.body.unshift(return_decl);
-    return node;
+    return visit.megatron_deignore(node);
 }
 
 /* 
@@ -165,7 +167,8 @@ function instrument_calls(node, ctx) {
     var args = [visit.make_literal(ctx.function),
 		visit.make_literal(get_callee_name(node.callee)),
 		visit.make_thunk(node),
-		visit.make_this(node.loc)
+		visit.make_this(node.loc),
+		visit.make_literal(node.type == "NewExpression")
 	       ];
     return visit.make_call('log_call', args, node.loc);
 }

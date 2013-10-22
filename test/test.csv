@@ -1,0 +1,15 @@
+file,args,expected_time,runcmd
+${MEGATRON_HOME}/test/alioth/binary-trees.js,-- 20,45.94,${D8}
+${MEGATRON_HOME}/test/alioth/fannkuch-redux.js,-- 12,65.18,${D8}
+${MEGATRON_HOME}/test/alioth/fasta.js,-- 25000000 > /dev/null,16.97,${D8}
+${MEGATRON_HOME}/test/alioth/k-nucleotide.js,-- 0 < ${MEGATRON_HOME}/test/alioth/knucleotide-input.txt,0.2,${D8}
+${MEGATRON_HOME}/test/alioth/n-body.js,-- 50000000,32.202,${D8}
+${MEGATRON_HOME}/test/alioth/regex-dna.js,-- 0 < ${MEGATRON_HOME}/test/alioth/regexdna-input.txt,0.02,${D8}
+${MEGATRON_HOME}/test/alioth/reverse-complement.js,-- 0 < ${MEGATRON_HOME}/test/alioth/revcomp-input.txt >/dev/null,0.01,${D8}
+${MEGATRON_HOME}/test/alioth/spectral-norm.js,-- 5500,15.02,${D8}
+${MEGATRON_HOME}/test/calleecallexpression.js,,,nodejs
+${MEGATRON_HOME}/test/higherorder.js,,,nodejs
+${MEGATRON_HOME}/test/return_test.js,,,nodejs
+${MEGATRON_HOME}/test/variabledecl.js,,,nodejs
+${MEGATRON_HOME}/test/new.js,,,nodejs
+${MEGATRON_HOME}/test/doppio.js,,,/bin/true

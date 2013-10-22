@@ -111,11 +111,11 @@ spectral-norm & 15.1626989841 &
 \end{tabular}
 \nocaptionrule{}
 \caption{Median of 3 runs of the Alioth benchmark suite}
-\label{}
+\label{tab:alioth}
 \end{table}
 
 
-Megatron is able to profile the Alioth benchmark suite. Its instrumentations incur significant overhead, but since all function calls are uniformly slowed down, the profiling information it extracts should display the same relative relative times. 
+Megatron is able to profile the Alioth benchmark suite. Its instrumentations incur significant overhead, but since all function calls are uniformly slowed down, the profiling information it extracts should display the same relative relative times. Not included is the binary-tree benchmark, which takes roughly an hour to run on our test system and was impossible to obtain numbers for in a reasonable time. 
 
 
 

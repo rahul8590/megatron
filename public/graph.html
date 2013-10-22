@@ -71,6 +71,7 @@ function sleep(milliseconds) {
 socket.on('graph',function(data) {
 	
 	var nodes = {}; // creates a node list of to and from function
+	var fcount = []; // maintains function count
 	g = new Graph();
 	var call_list = JSON.parse(data);
 	console.log("in graph.html the call_list is " + call_list.length);
@@ -79,6 +80,8 @@ socket.on('graph',function(data) {
 	{ 
 		var obj = JSON.parse(call_list[i]);	
 		console.log(obj.from + ' ' + obj.to);
+		
+		// === Dragon graph specific code starts here === //
 		if (nodes[obj.from]) {
 			if (nodes[obj.from] != obj.to)
 			{
@@ -91,8 +94,52 @@ socket.on('graph',function(data) {
 			g.addEdge(obj.from,obj.to, {directed: true});
 			nodes[obj.from] = obj.to;
 		}
-			
+		
+		if (fcount[obj.from]) {
+			fcount[obj.from]++;
+		}
+		if (!fcount[obj.from]) {
+			fcount[obj.form] = 1;
+		}
+		
+		if (fcount[obj.to]) {
+			fcount[obj.to]++;
+		}
+		if (!fcount[obj.to]) {
+			fcount[obj.to] = 1;
+		}
+		//============ Dragon graph specific code ends here =======================//
+		
+		
+		//================= Code for Edge Creation Via Springy ====================//
+		/*
+		if (!nodes[obj.from]) { 
+		if(!nodes[obj.to] ) {
+			graph.newEdge(graph.newNode({label: obj.from}),graph.newNode({label: obj.to}), {color: '#00A0B0'});
+			nodes[obj.from] = 1 ;
+			nodes[obj.to] = 1;
+		}
+		if(nodes[obj.to] ) {
+			graph.newEdge(graph.newNode({label: obj.from}),obj.to, {color: '#00A0B0'});
+			nodes[obj.from] = 1;
+			nodes[obj.to]++;
+		}
 	}
+	 if (nodes[obj.from]) {
+		if (!nodes[obj.to]) {
+			graph.newEdge(obj.from,graph.newNode({label:obj.to}), {color: '#00A0B0'});
+			nodes[obj.to] = 1;
+			nodes[obj.from]++ ;
+		}
+		if (nodes[obj.to]) {
+			graph.newEdge(obj.from,obj.to,{color: '#00A0B0'});
+			nodes[obj.to]++;
+			nodes[obj.from]++;
+		}
+	}
+	*/
+		
+	}  // End of For function
 	nodes = {};
 	sleep(1500);
 	socket.emit('gobjects' ,'clear');
@@ -100,6 +147,9 @@ socket.on('graph',function(data) {
 		layouter.layout(); 
 		renderer = new Graph.Renderer.Raphael('canvas', g, width, height);
 		renderer.draw();
+	
+	//Generating Frequecy call table (under construction)
+	//document.getElementById('fcall').value = "The function call frequency is " +JSON.stringify(fcount);
 	
 	
 });
@@ -169,6 +219,7 @@ jQuery(function(){
 </script>
 
 <div id="canvas"> </div>
+<div id="fcall"></div>
 
 </body>
 </html>

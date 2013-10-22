@@ -32,3 +32,14 @@ commands:
 Then, edit the `test/runtest` script, and change the variable
 `D8_PATH` to point to the file in `v8/out/native/d8`.
 
+# Running Megatron's web interface
+
+To start Megatron, run 'main.js' under Node:
+
+* `nodejs main.js`
+
+Navigate to `http://localhost:8590` in your web browser of choice.
+
+# Running Megatron to rewrite code locally
+
+`nodejs src/rewrite.js /path/to/javascript/to/rewrite`

@@ -1,0 +1,82 @@
+\documentclass{article}
+
+\usepackage[english]{babel}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage[pdftex]{graphicx}
+\usepackage{url}
+\usepackage{setspace}
+\usepackage{natbib}
+
+
+\begin{document}
+
+\title{Megatron Writeup}
+\author{Ted Smith and Rahul Ram}
+\date{October 21, 2013}
+
+\maketitle
+
+Megatron is a source-to-source rewriter that adds profiling
+instrumentation to Javascript programs.  
+Megatron is based around a general framework for Javascript
+manipulation using a visitor pattern.
+
+\section{Implementation}
+
+Megatron contains three main components:
+
+\begin{itemize}
+\item visit.js, a framework for transforming Javascript ASTs
+\item rewrite.js, a client of visit.js that converts javascript to
+  profiled javascript
+\item runtime.js, a small library embedded in the output of rewrite.js
+  that contains various functions related to profiling.
+\end{itemize}
+
+Megatron's rewriter is implemented as four passes over the AST.
+
+The first pass stores the names of all declared functions for later
+use.
+
+The second pass rewrites every function and function expression to
+return an object with three fields: ``megatron_func_id'',
+``megatron_ret'', and ``megatron_this''. The first is used to build a
+call graph that resolves calls to the same function via different
+identifiers as a result of dynamism. The second is the original return
+value of the function. The third is the ``this'' construct, which is
+returned in the event the function invocation occurred inside a
+``new'' expression.
+
+The third pass rewrites every function call to an invocation of the
+Megatron runtime function ``log_call''. ``log_call'' is passed two
+strings representing the caller and callee function, a thunk that will
+return the value of the call, and a boolean that is true if
+``log_call'' is wrapping an invocation of ``new''. ``log_call''
+Functions invoked by ``new'' implicitly return the ``this'' object, so
+Megatron must override its default behavior and return ``this'' rather
+than the return value of the constructor function, which is usually
+``undefined''. ``log_call'' also takes the ``this'' object as a
+parameter. Without explicitly passing ``this'', Megatron would
+evaluate the thunk in the global ``this'' environment, causing
+programs to execute incorrectly.
+
+The final pass rewrites every reference to a function declared as per the table in the first pass. This is a conservative measure to ensure that function objects which leave the edges of the profiled application have the expected return value.
+
+\section{Interface}
+
+web interface
+
+offloading to server
+
+graph rendering
+
+
+\section{Results}
+
+Megatron is able to profile the Alioth benchmark suite. Its instrumentations incur significant overhead, but since all function calls are uniformly slowed down, the profiling information it extracts should display the same relative relative times. 
+
+\end{document}
+

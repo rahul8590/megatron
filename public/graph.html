@@ -26,7 +26,6 @@ var redraw, g, renderer;
 var width = $(document).width();
 var height = $(document).height();
 
-console.log(width+' ' + height);
 /*
 
 The Call objects are generated in the client side which needs 
@@ -65,6 +64,8 @@ function sleep(milliseconds) {
 
 var fcount = []; // maintains function count
 var lfun = [];   // maintains a list of function names
+var exefun = []; // maintains a list of function execution times
+	
 	
 socket.on('graph',function(data) {
 	
@@ -78,18 +79,24 @@ socket.on('graph',function(data) {
 		var obj = JSON.parse(call_list[i]);	
 		console.log(obj.from + ' ' + obj.to);
 		
-
-		
 		if (!fcount[obj.from]) {
 		    fcount[obj.from] = 0;
 		    lfun.push(obj.from);
+		    
 		}
 	    fcount[obj.from]++;
+	    
 	    if (!fcount[obj.to]) {
 			fcount[obj.to] = 0;
-			lfun.push(obj.to);
+			lfun.push(obj.to);	
 	    }
 	    fcount[obj.to]++;
+		
+		if(!exefun[obj.to]) {
+			exefun[obj.to] = obj.exit - obj.entry;
+			console.log("exe func for" + obj.to + "==> " + exefun[obj.to]);
+		}
+		
 		
 		//================= Code for Edge Creation Via Springy ====================//
 
@@ -108,8 +115,13 @@ socket.on('graph',function(data) {
 	//document.getElementById('fcall').value = "The function call frequency is " +JSON.stringify(fcount);
 	var content = ' ';
 	for (var j = lfun.length ; j >0; j-- ) {
-		var func = lfun.pop();
-		content += func+"() function calls #" +fcount[func] +"<br>";
+		var fname = lfun.pop();
+		if (exefun[fname]) { 
+		content += fname+"() function calls #" +fcount[fname] + "Exe time ==>" + exefun[fname] + "<br>";
+		}
+		else { 
+			content += fname+"() function calls #" +fcount[fname] + "<br>";
+		}
 	}
 	
 	document.getElementById('fcalls').innerHTML = content;

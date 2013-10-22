@@ -67,11 +67,31 @@ The final pass rewrites every reference to a function declared as per the table 
 
 \section{Interface}
 
-web interface
+Web Interface:
 
-offloading to server
+The web interface has the following paths 
+\begin{itemize}
+\item  "/" The index page allows user to enter the javascript code to be profiled.
+\item  "/rewrite" The rewrite displays all result from instrumented code.
+\item "/graph"  Generates Call Graph and Frequency of calls for all functions.
+\end{itemize}
 
-graph rendering
+
+Streaming of Objects:
+
+Two channels (gobjects, graph)are created between client and server. 
+The gobject channel allows receiver to stream the info regarded the profiled object 
+back to server. In the graph channel the server streams the crunched profiled object back
+to client which is later piped to input the graph.
+
+
+Graph Rendering:
+
+We use springy.js library for renedering the  object values of graph.
+The objects that are streamed from server are added to edges of the graph and then rendered.
+
+
+
 
 
 \section{Results}

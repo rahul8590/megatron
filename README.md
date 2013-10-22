@@ -16,8 +16,9 @@ This project depends on the following Node packages:
 * Esprima
 * escodegen
 * assert
+* socket.io
 
-To get them, `npm install esprima escodegen assert`.
+To get them, `npm install esprima escodegen assert socket.io`.
 
 # Running the Test Suite
 
@@ -36,9 +37,10 @@ Then, edit the `test/runtest` script, and change the variable
 
 To start Megatron, run 'main.js' under Node:
 
-* `nodejs main.js`
+* `nodejs index.js`
 
 Navigate to `http://localhost:8590` in your web browser of choice.
+To Generate Calling Graph of the same:  `http://localhost:8590/graph`
 
 # Running Megatron to rewrite code locally
 

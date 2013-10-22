@@ -76,7 +76,32 @@ graph rendering
 
 \section{Results}
 
+\begin{table}[t!]
+\centering
+\small
+\newcommand{\siqr}[1]{\scriptsize(#1)}
+\begin{tabular}{|r|r|r|}
+\hline
+\textbf{Program} & \textbf{Med.} (profiled) & \textbf{Med.} (standard) \\
+\hline
+fannkuch-redux & 82.0006430149 &
+fasta & 20.8912289143 &
+k-nucleotide & 0.2661221027 &
+n-body & 40.6880369186 &
+regex-dna & 0.027422905 &
+reverse-complement & 0.0171220303 &
+spectral-norm & 15.1626989841 &
+\hline
+\end{tabular}
+\nocaptionrule{}
+\caption{Median of 3 runs of the Alioth benchmark suite}
+\label{}
+\end{table}
+
+
 Megatron is able to profile the Alioth benchmark suite. Its instrumentations incur significant overhead, but since all function calls are uniformly slowed down, the profiling information it extracts should display the same relative relative times. 
+
+
 
 \end{document}
 

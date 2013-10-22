@@ -72,12 +72,12 @@ socket.on('graph',function(data) {
 	var nodes = {}; // creates a node list of to and from function
 	
 	var call_list = JSON.parse(data);
-	console.log("in graph.html the call_list is " + call_list.length);
+	//console.log("in graph.html the call_list is " + call_list.length);
 	
 	for (var i =0; i < call_list.length; i++)
 	{ 
 		var obj = JSON.parse(call_list[i]);	
-		console.log(obj.from + ' ' + obj.to);
+		//console.log(obj.from + ' ' + obj.to);
 		
 		if (!fcount[obj.from]) {
 		    fcount[obj.from] = 0;
@@ -94,7 +94,7 @@ socket.on('graph',function(data) {
 		
 		if(!exefun[obj.to]) {
 			exefun[obj.to] = obj.exit - obj.entry;
-			console.log("exe func for" + obj.to + "==> " + exefun[obj.to]);
+			//console.log("exe func for" + obj.to + "==> " + exefun[obj.to]);
 		}
 		
 		
@@ -138,7 +138,7 @@ jQuery(function(){
  var springy = window.springy = jQuery('#canvas').springy({
     graph: graph,
       nodeSelected: function(node){
-	  console.log('Node selected: ' + JSON.stringify(node.data));
+	  //console.log('Node selected: ' + JSON.stringify(node.data));
     }
   });
 }); 

@@ -67,7 +67,7 @@ The final pass rewrites every reference to a function declared as per the table 
 
 \section{Interface}
 
-Web Interface:
+\subsection{Web Interface}
 
 The web interface has the following paths 
 \begin{itemize}
@@ -77,7 +77,7 @@ The web interface has the following paths
 \end{itemize}
 
 
-Streaming of Objects:
+\subsection{Streaming of Objects}
 
 Two channels (gobjects, graph)are created between client and server. 
 The gobject channel allows receiver to stream the info regarded the profiled object 
@@ -85,18 +85,40 @@ back to server. In the graph channel the server streams the crunched profiled ob
 to client which is later piped to input the graph.
 
 
-Graph Rendering:
+\subsection{Graph Rendering}
 
 We use springy.js library for renedering the  object values of graph.
 The objects that are streamed from server are added to edges of the graph and then rendered.
 
-
-
-
-
 \section{Results}
 
-Megatron is able to profile the Alioth benchmark suite. Its instrumentations incur significant overhead, but since all function calls are uniformly slowed down, the profiling information it extracts should display the same relative relative times. 
+\begin{table}[t!]
+\centering
+\small
+\newcommand{\siqr}[1]{\scriptsize(#1)}
+\begin{tabular}{|r|r|r|}
+\hline
+\textbf{Program} & \textbf{Med.} (profiled) & \textbf{Med.} (standard) \\
+\hline
+fannkuch-redux & 82.0006430149 &
+fasta & 20.8912289143 &
+k-nucleotide & 0.2661221027 &
+n-body & 40.6880369186 &
+regex-dna & 0.027422905 &
+reverse-complement & 0.0171220303 &
+spectral-norm & 15.1626989841 &
+\hline
+\end{tabular}
+\nocaptionrule{}
+\caption{Median of 3 runs of the Alioth benchmark suite}
+\label{tab:alioth}
+\end{table}
+
+
+Megatron is able to profile the Alioth benchmark suite. Its instrumentations incur significant overhead, but since all function calls are uniformly slowed down, the profiling information it extracts should display the same relative relative times. Not included is the binary-tree benchmark, which takes roughly an hour to run on our test system and was impossible to obtain numbers for in a reasonable time. 
+
+
 
 \end{document}
+
 

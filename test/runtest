@@ -32,7 +32,7 @@ def run_test(test, profiled_program_path):
     start_time = time()
     retval = os.system(cmdline)
     end_time = time()
-    print "{} : {}".format(test['name'], start_time - end_time)
+    print "{} : {}".format(test['file'], end_time - start_time)
     return retval == 0
 
 def main():
@@ -50,13 +50,17 @@ def main():
     dr = csv.DictReader(open(test_file_name, "r"))
     for test in dr:
         total += 1
-        (ex, profiled_program) = rewrite(test['file'])
-        if ex != 0:
-            rewrite_fail.append(test['file'])
+        if not "--raw" in sys.argv:
+            (ex, profiled_program) = rewrite(test['file'])
+            if ex != 0:
+                rewrite_fail.append(test['file'])
+        else:
+            profiled_program = test['file']
+            ex = 0
         x = run_test(test, profiled_program)
         if not x:
             run_fail.append(test['file'])
-        if x and (ex == 0):
+        if x and (ex == 0) and not "--raw" in sys.argv:
             tmpfiles.append(profiled_program)
             
 

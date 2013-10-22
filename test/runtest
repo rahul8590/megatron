@@ -3,11 +3,13 @@
 import csv, os, sys, tempfile, subprocess
 
 TMPDIR="/tmp/megatron"
+D8_PATH="/home/tedks/Source/v8/out/native/d8"
 
 def setup():
     print "Starting test run"
     os.environ['MEGATRON_HOME'] = os.path.join(
         os.path.abspath(os.path.dirname(sys.argv[0])), "..")
+    os.environ['D8'] = D8_PATH
     try:
         os.mkdir(TMPDIR)
     except OSError as e:
@@ -23,10 +25,9 @@ def rewrite(filename):
     return (ret, output.name)
 
 def run_test(test, profiled_program_path):
-    cmdline = "{} {} {} 2>&1".format(test['runcmd'],
+    cmdline = "{} {} {} >/dev/null 2>&1".format(test['runcmd'],
                                                 profiled_program_path, 
                                                 test['args'])
-    print "Running {}".format(cmdline)
     retval = os.system(cmdline)
     return retval == 0
 

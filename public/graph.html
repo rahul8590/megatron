@@ -63,12 +63,13 @@ function sleep(milliseconds) {
 }
 
 
-
+var fcount = []; // maintains function count
+var lfun = [];   // maintains a list of function names
 	
 socket.on('graph',function(data) {
 	
 	var nodes = {}; // creates a node list of to and from function
-	var fcount = []; // maintains function count
+	
 	var call_list = JSON.parse(data);
 	console.log("in graph.html the call_list is " + call_list.length);
 	
@@ -81,20 +82,14 @@ socket.on('graph',function(data) {
 		
 		if (!fcount[obj.from]) {
 		    fcount[obj.from] = 0;
+		    lfun.push(obj.from);
 		}
 	    fcount[obj.from]++;
 	    if (!fcount[obj.to]) {
-		fcount[obj.to] = 0;
+			fcount[obj.to] = 0;
+			lfun.push(obj.to);
 	    }
 	    fcount[obj.to]++;
-	    
-		
-		
-		if (fcount[obj.to]) {
-		}
-	
-		//============ Dragon graph specific code ends here =======================//
-		
 		
 		//================= Code for Edge Creation Via Springy ====================//
 
@@ -111,33 +106,15 @@ socket.on('graph',function(data) {
     
 	//Generating Frequecy call table (under construction)
 	//document.getElementById('fcall').value = "The function call frequency is " +JSON.stringify(fcount);
+	var content = ' ';
+	for (var j = lfun.length ; j >0; j-- ) {
+		var func = lfun.pop();
+		content += func+"() function calls #" +fcount[func] +"<br>";
+	}
 	
+	document.getElementById('fcalls').innerHTML = content;
 	
 });
-
-sleep(1000);
-window.onload = function () {	
-	
-/* layout the graph using the Spring layout implementation */
-  //var layouter = new Graph.Layout.Spring(g);
-  //layouter.layout(); 
-   /* draw the graph using the RaphaelJS draw implementation */
-   //renderer = new Graph.Renderer.Raphael('canvas', g, width, height);
-   //renderer.draw();
-    
-}
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // Newly inserted code ends here 
@@ -146,7 +123,7 @@ window.onload = function () {
 
 jQuery(function(){
  document.getElementById('canvas').value = null; // flushing the canvas to avoid caching of objects
-  var springy = window.springy = jQuery('#canvas').springy({
+ var springy = window.springy = jQuery('#canvas').springy({
     graph: graph,
       nodeSelected: function(node){
 	  console.log('Node selected: ' + JSON.stringify(node.data));
@@ -159,8 +136,23 @@ jQuery(function(){
   
 </script>
 
-<canvas id="canvas"> </canvas>
-<div id="fcall"></div>
+<table>
+	<tr>
+	<td> Call GRaph </td>
+	<td> Frequency of func() Calls</td>
+	</tr>
+	<tr>
+	<td><canvas id="canvas" width="640" height="480"> </canvas></td>
+	<td><div id="fcalls"> </div> </td>
+	</tr>
+</table>
+
+
+
+
+
+
+
 
 </body>
 </html>

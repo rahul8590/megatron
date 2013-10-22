@@ -113,9 +113,6 @@ function rewrite_returns(node, ctx) {
     return visit.megatron_deignore(node);
 }
 
-/* 
- * A visitor that adds entry and exit instrumentation to functions.
- */ 
 function instrument_calls(node, ctx) {
     if (node.type != "CallExpression" && node.type != "NewExpression")
 	return node;

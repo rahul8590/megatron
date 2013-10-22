@@ -104,3 +104,12 @@ function log_call(caller, callee, thunk, these, from_new) {
     
     return actual_ret;
 }
+
+
+function megatron_wrap(from, via, fid) {
+    return function () {
+	return log_call(from, via, 
+			function () {return thunk.apply(this, arguments);}, 
+			null, false);
+    };
+}

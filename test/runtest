@@ -26,6 +26,7 @@ def run_test(test, profiled_program_path):
     cmdline = "{} {} {} 2>&1".format(test['runcmd'],
                                                 profiled_program_path, 
                                                 test['args'])
+    print "Running {}".format(cmdline)
     retval = os.system(cmdline)
     return retval == 0
 
@@ -35,12 +36,11 @@ def main():
     total = 0
     test_file_name = ""
     if len(sys.argv) < 2:
-        test_file_name = sys.argv[0].replace("runtest.py", "test.csv")
+        test_file_name = sys.argv[0].replace("runtest", "test.csv")
     else:
         test_file_name = sys.argv[1]
 
     setup()
-    os.system("echo ${MEGATRON_HOME}")
 
     dr = csv.DictReader(open(test_file_name, "r"))
     for test in dr:

@@ -58,7 +58,7 @@ function get_really_high_res_time() {
  */ 
 function eject(call) {
     if (detect_browser() == 'd8') {
-	print("{ from: "+ call.from + "}");
+	;//print("{ from: "+ call.from + "}");
     }
     else
 	console.log(call);
@@ -91,16 +91,16 @@ function log_call(caller, callee, thunk, these, from_new) {
 	actual_ret = megatron_ret;
     } else {
 	call.to = megatron_ret.__megatron_function_id;
-	actual_ret = megatron_ret.__megatron_ret;
+	if (from_new) {
+	    actual_ret = megatron_ret.__megatron_this;
+	} else {
+	    actual_ret = megatron_ret.__megatron_ret;
+	}
     }
     
     
     // do something with the call object
     eject(call);
     
-    if (from_new) {
-	return megatron_ret.__megatron_this;
-    } else {
-	return actual_ret;
-    }
+    return actual_ret;
 }

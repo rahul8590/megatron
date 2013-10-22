@@ -24,7 +24,8 @@ module.exports = {
     make_ret: make_return,
     make_objexp: make_objexp,
     make_block: make_block,
-    make_this: make_this
+    make_this: make_this,
+    megatron_deignore: megatron_deignore
 };
 
 /*
@@ -47,7 +48,8 @@ function visit(ast, visitors, optargs) {
     function evisit(n, c) {
 	return visit(n, visitors, 
 		     {context: c,
-		      debug: optargs.debug});
+		      debug: optargs.debug,
+		     visit_ignored: optargs.visit_ignored});
     };
     function curry_evisit(c) {
 	return function (n) { return evisit(n, c); };
@@ -62,7 +64,8 @@ function visit(ast, visitors, optargs) {
     debug("Visiting a statement of type " + ast.type);
 
     // ignore nodes we've created
-    if (ast.megatron_ignore === true) {
+    if (ast.megatron_ignore === true &&
+	!(optargs.visit_ignored)) {
 	debug("Megatron-created node, bailing");
 	return ast;
     }
@@ -386,4 +389,11 @@ function make_block(stmts, loc) {
 
 function make_this(loc) {
     return __construct_node("ThisExpression", loc);
+}
+
+function megatron_deignore(node) {
+    /* un-ignore a node and its children. */
+    return visit(node, [function (node) { 
+	node.megatron_ignore = false; 
+	return node}], {debug: true, visit_ignored: true});
 }

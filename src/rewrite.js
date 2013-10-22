@@ -110,7 +110,7 @@ function rewrite_returns(node, ctx) {
     node.body = visit.visit(node.body, [replace_returns], {debug: true})
     node.body.body.push(return_stmt);
     node.body.body.unshift(return_decl);
-    return node;
+    return visit.megatron_deignore(node);
 }
 
 /* 

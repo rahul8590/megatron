@@ -67,7 +67,7 @@ The final pass rewrites every reference to a function declared as per the table 
 
 \section{Interface}
 
-Web Interface:
+\subsection{Web Interface}
 
 The web interface has the following paths 
 \begin{itemize}
@@ -77,7 +77,7 @@ The web interface has the following paths
 \end{itemize}
 
 
-Streaming of Objects:
+\subsection{Streaming of Objects}
 
 Two channels (gobjects, graph)are created between client and server. 
 The gobject channel allows receiver to stream the info regarded the profiled object 
@@ -85,14 +85,10 @@ back to server. In the graph channel the server streams the crunched profiled ob
 to client which is later piped to input the graph.
 
 
-Graph Rendering:
+\subsection{Graph Rendering}
 
 We use springy.js library for renedering the  object values of graph.
 The objects that are streamed from server are added to edges of the graph and then rendered.
-
-
-
-
 
 \section{Results}
 
@@ -124,4 +120,5 @@ Megatron is able to profile the Alioth benchmark suite. Its instrumentations inc
 
 
 \end{document}
+
 

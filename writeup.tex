@@ -63,10 +63,20 @@ parameter. Without explicitly passing ``this'', Megatron would
 evaluate the thunk in the global ``this'' environment, causing
 programs to execute incorrectly.
 
+The final pass rewrites every reference to a function declared as per the table in the first pass. This is a conservative measure to ensure that function objects which leave the edges of the profiled application have the expected return value.
+
 \section{Interface}
+
+web interface
+
+offloading to server
+
+graph rendering
+
 
 \section{Results}
 
+Megatron is able to profile the Alioth benchmark suite. Its instrumentations incur significant overhead, but since all function calls are uniformly slowed down, the profiling information it extracts should display the same relative relative times. 
 
 \end{document}
 

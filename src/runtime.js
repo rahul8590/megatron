@@ -60,16 +60,16 @@ function eject(call) {
     if (detect_browser() == 'd8') {
 	;//print("{ from: "+ call.from + "}");
     }
-     else if (detect_browser() != 'node' || detect_browser() != 'd8' ) {
-		document.writeln("<p> Call Entry Time is: "+call.entry +'  Call Exit time is: '+ call.exit+'<br>Calling from ==> '+call.from+'()'+ '<br>Calling via =>'+call.via+'()'+'<br>Calling to =>'+call.to+'()'+" </p> ");
-		var socket = io.connect('http://localhost:8590');
-		socket.on('init',function (data) {
-			if (data == 'start') {
-				socket.emit('gobjects',JSON.stringify(call)); 
-				//socket.emit('gobjects','end');
-			}		
-		});
-	}
+    else if (detect_browser() != 'node' && detect_browser() != 'd8' ) {
+	document.writeln("<p> Call Entry Time is: "+call.entry +'  Call Exit time is: '+ call.exit+'<br>Calling from ==> '+call.from+'()'+ '<br>Calling via =>'+call.via+'()'+'<br>Calling to =>'+call.to+'()'+" </p> ");
+	var socket = io.connect('http://localhost:8590');
+	socket.on('init',function (data) {
+	    if (data == 'start') {
+		socket.emit('gobjects',JSON.stringify(call)); 
+		//socket.emit('gobjects','end');
+	    }		
+	});
+    }
     else
 	console.log(call);
 }

@@ -119,7 +119,7 @@ function log_call(caller, callee, thunk, these, from_new) {
 function megatron_wrap(from, via, fid) {
     return function () {
 	return log_call(from, via, 
-			function () {return thunk.apply(this, arguments);}, 
+			function () {return fid.apply(this, arguments);}, 
 			null, false);
     };
 }

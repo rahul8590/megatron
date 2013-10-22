@@ -52,6 +52,26 @@ function function_table() {
 	}
 	return node;
     }
+    
+    function wrap_functions(node, ctx) {
+	if (!(node.type == "AssignmentExpression" || 
+	    node.type == "ReturnExpression"))
+	    return node;
+	var target;
+	if (node.type == "AssignmentExpression")
+	    target = 'right';
+	else if (node.type == "ReturnExpression")
+	    target = 'argument';
+
+	if (target.type != "Identifier")
+	    return node;
+	node[target] = visit.make_call("megatron_wrap",
+				      [visit.make_literal('unknown'),
+				       visit.make_literal(node[target].name),
+				       visit.make_id(node[target].name)],
+				       node.loc);
+    }
+    ret.wrap_functions = wrap_functions;
     ret.store_functions = store_functions;
     return ret;
 }
@@ -151,6 +171,7 @@ function instrument_calls(node, ctx) {
 	    return "<new " + get_callee_name(callee.callee) + ">";
 
 	case "ConditionalExpression":
+	case "LogicalExpression":
 	    return "<dynamic conditional>";
 
 	default:
@@ -186,11 +207,13 @@ function profile(program_string, show_debug) {
     var ftab = function_table();
     visit.visit(ast, [ftab.store_functions]);
 
-    var return_wrapped_ast = visit.visit(ast, 
+    var closured_ast = visit.visit(ast, [ftab.wrap_functions]);
+    var return_wrapped_ast = visit.visit(closured_ast,
     			     		[rewrite_returns]);
 
-    var profiled_ast = visit.visit(ast, [instrument_calls], false);
-
+    var profiled_ast = visit.visit(return_wrapped_ast, 
+				   [instrument_calls], false);
+    
     var final_ast = visit.visit(profiled_ast, [sanity_check], false);
 
     return (fs.readFileSync('./src/runtime.js') + 

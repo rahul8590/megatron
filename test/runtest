@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import csv, os, sys, tempfile, subprocess
+from time import time
 
 TMPDIR="/tmp/megatron"
 D8_PATH="/home/tedks/Source/v8/out/native/d8"
@@ -28,7 +29,10 @@ def run_test(test, profiled_program_path):
     cmdline = "{} {} {} >/dev/null 2>&1".format(test['runcmd'],
                                                 profiled_program_path, 
                                                 test['args'])
+    start_time = time()
     retval = os.system(cmdline)
+    end_time = time()
+    print "{} : {}".format(test['name'], start_time - end_time)
     return retval == 0
 
 def main():

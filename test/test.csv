@@ -1,5 +1,4 @@
 file,args,expected_time,runcmd
-${MEGATRON_HOME}/test/alioth/binary-trees.js,-- 20,45.94,${D8}
 ${MEGATRON_HOME}/test/alioth/fannkuch-redux.js,-- 12,65.18,${D8}
 ${MEGATRON_HOME}/test/alioth/fasta.js,-- 25000000 > /dev/null,16.97,${D8}
 ${MEGATRON_HOME}/test/alioth/k-nucleotide.js,-- 0 < ${MEGATRON_HOME}/test/alioth/knucleotide-input.txt,0.2,${D8}

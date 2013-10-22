@@ -55,6 +55,7 @@ function visit(ast, visitors, optargs) {
 	return function (n) { return evisit(n, c); };
     };
     var context = optargs.context;
+    assert.notEqual(context, undefined);
 
     if (ast === null)  {
 	debug("Got a null ast, exiting");
@@ -99,7 +100,7 @@ function visit(ast, visitors, optargs) {
 
     case "TryStatement":
 	ast.block = evisit(ast.block, context);
-	ast.finalizer = evisit(ast.finalizer);
+	ast.finalizer = evisit(ast.finalizer, context);
 	break;
 
     case "CatchClause":
@@ -153,7 +154,9 @@ function visit(ast, visitors, optargs) {
 	break;
 
     case "FunctionExpression":
-	var new_context = {function: "anonym_func:" + ast.loc.start.line};
+	var funcid = (context.function + "__anonym:" + 
+		      ast.loc.start.line + ":" + ast.loc.start.column)
+	var new_context = {function: funcid};
 	ast.body = evisit(ast.body, new_context);
 	ast.defaults = ast.defaults.map(curry_evisit(new_context));
 	break;
@@ -395,5 +398,6 @@ function megatron_deignore(node) {
     /* un-ignore a node and its children. */
     return visit(node, [function (node) { 
 	node.megatron_ignore = false; 
-	return node}], {debug: true, visit_ignored: true});
+	return node}], {debug: true, visit_ignored: true, 
+		       context: {function: "top-level"}});
 }
